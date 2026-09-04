@@ -1,744 +1,687 @@
-⚙️ ConfigPilot: AI Configuration & Reliability Copilot
-Predict. Explain. Simulate. Recommend.
+# ⚙️ ConfigPilot: AI Configuration & Reliability Copilot
 
-An AI-powered configuration and reliability intelligence platform that helps engineers understand execution failures, identify influential configuration parameters, investigate failure patterns, evaluate configuration changes, and discover lower-predicted-risk configurations from historical execution data.
+### Predict. Explain. Simulate. Recommend.
 
-Built for the SandDisk Challenge
+> **An AI-powered configuration intelligence and reliability platform that helps engineers understand failures, evaluate configuration risk, investigate execution behavior, and identify lower-predicted-risk configurations.**
 
-**Core Product Principle**
+**Built for the SandDisk Challenge**
 
-> "Don't just monitor failures. Help engineers choose safer configurations before failures happen."
+---
 
-Python Scikit-learn Streamlit Pandas NumPy
+<p align="center">
 
-🔗 Live Links
-Live Application: Add Streamlit URL after deployment
-GitHub Repository: Add GitHub repository URL
-Demo Video: Add demo video URL
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit)
+![Scikit-learn](https://img.shields.io/badge/scikit--learn-ML-orange?logo=scikit-learn)
+![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-150458?logo=pandas)
+![NumPy](https://img.shields.io/badge/NumPy-Numerical%20Computing-013243?logo=numpy)
+![Status](https://img.shields.io/badge/Status-Prototype-success)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-📑 Table of Contents
-1.Overview
-2.Challenge Requirements Compliance
-3.Screenshots
-4.Core Features ⭐
-5.AI/ML Capabilities ⭐
-6.Technology Stack ⭐
-7.Project Architecture
-8.Project Structure
-9.Dataset & Methodology
-10.Installation & Setup ⭐
-11.Model Evaluation
-12.Explainability & Reliability Intelligence
-13.Limitations & Responsible Interpretation
-14.Future Enhancements
-15.Contributors
-16.License
-17.Acknowledgements
+</p>
 
-📖 Overview
-ConfigPilot is an AI Configuration & Reliability Copilot designed to help engineers move beyond simply observing execution failures toward understanding, predicting, investigating, and reducing configuration-related risk.
+---
 
-Modern execution environments can contain a large number of configuration parameters, workload conditions, telemetry signals, and randomized variables. When an execution fails, identifying what influenced the failure, what changed, whether the behavior is repeatable, and which configuration should be tried next can be difficult.
+## 🚀 Live Demo
 
-ConfigPilot addresses this workflow through an integrated analytics and AI/ML platform.
+🌐 **Streamlit Application:**  
+> *Add deployed Streamlit URL here*
 
-The system transforms execution data into actionable engineering insights through:
+🎥 **Demo Video:**  
+> *Add 5-minute demo video link here*
+
+💻 **GitHub Repository:**  
+> *Add repository URL here*
+
+---
+
+# 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Problem Statement](#-problem-statement)
+- [Solution](#-solution)
+- [Key Features](#-key-features)
+- [Architecture](#-architecture)
+- [Screenshots](#-screenshots)
+- [Dataset](#-dataset)
+- [AI/ML Methodology](#-aiml-methodology)
+- [Model Evaluation](#-model-evaluation)
+- [Explainability](#-explainability)
+- [Configuration What-If Analysis](#-configuration-what-if-analysis)
+- [Recommendation Engine](#-recommendation-engine)
+- [Ask ConfigPilot](#-ask-configpilot)
+- [Technology Stack](#-technology-stack)
+- [Project Structure](#-project-structure)
+- [Installation & Setup](#-installation--setup)
+- [Usage](#-usage)
+- [Limitations](#-limitations)
+- [Future Enhancements](#-future-enhancements)
+- [Demo Flow](#-demo-flow)
+- [Contributors](#-contributors)
+- [Acknowledgements](#-acknowledgements)
+- [License](#-license)
+
+---
+
+# 🌟 Overview
+
+Modern execution environments expose engineers to a large number of configuration parameters, workload variables, telemetry metrics, and randomized execution conditions.
+
+When an execution fails, the difficult questions are not simply:
+
+> **"Did it fail?"**
+
+Engineers also need to know:
+
+- **Why did it fail?**
+- **Which configuration factors matter most?**
+- **What changed between successful and failed executions?**
+- **Are failures deterministic or influenced by randomization?**
+- **Can the risk of a future failure be estimated?**
+- **What configuration should be considered next?**
+
+**ConfigPilot** addresses these questions through a unified AI/ML-powered reliability workflow.
+
+### Core Product Principle
+
+> **Don't just monitor failures. Help engineers choose lower-predicted-risk configurations before failures happen.**
+
+ConfigPilot combines:
+
 - Configuration intelligence
 - Failure-risk prediction
+- Explainable ML
 - Failure investigation
-- Configuration comparison
+- What-changed analysis
 - Randomization analysis
-- What-if configuration analysis
+- Configuration what-if analysis
 - Historical configuration recommendations
-- Natural-language interaction through Ask ConfigPilot
+- Natural-language querying
 
-The platform follows a simple workflow:
+---
 
-```
+# 🎯 Problem Statement
+
+Configuration-heavy execution systems can fail because of interactions between:
+
+- Configuration parameters
+- Workload characteristics
+- Resource utilization
+- Performance conditions
+- Randomization variables
+- Timing behavior
+- Environmental conditions
+
+Traditional monitoring systems primarily answer:
+
+> **"What happened?"**
+
+ConfigPilot extends this into:
+
+> **"What happened → Why → What changed → What could happen next → What configuration should we consider?"**
+
+---
+
+# 💡 Solution
+
+ConfigPilot transforms execution data into actionable reliability intelligence.
+
+```text
 Execution Data
-      ↓
-Data Processing & Feature Extraction
-      ↓
+      │
+      ▼
+Data Ingestion & Validation
+      │
+      ▼
+Feature Extraction & Normalization
+      │
+      ▼
 AI / ML Reliability Engine
-      ↓
-Prediction + Explainability + Analytics
-      ↓
+      │
+      ├──────────────► Failure Risk Prediction
+      │
+      ├──────────────► Configuration Intelligence
+      │
+      ├──────────────► Failure Investigation
+      │
+      ├──────────────► Randomization Analysis
+      │
+      ├──────────────► What-If Analysis
+      │
+      └──────────────► Configuration Recommendations
+                              │
+                              ▼
+                    Engineer Decision Support
+🧠 Key Features
+1. Configuration Intelligence
+
+Identifies configuration and execution variables that the predictive model relies on most strongly.
+
+Provides:
+
+Ranked feature importance
+Configuration impact insights
+Feature-level observations
+Model-based explanations
+
+Important: Feature importance indicates model reliance and should not be interpreted as proof of causality.
+
+2. Failure Risk Prediction
+
+Predicts the probability that an execution will fail.
+
+Output
+Failure probability
+PASS / FAIL prediction
+Risk level
+Configurable decision threshold
+Explainability information
+
+The prototype uses a Random Forest classifier with 300 trees.
+
+3. Failure Detective
+
+Investigates individual execution failures by combining:
+
+Prediction
+Actual execution outcome
+Telemetry
+Configuration values
+Feature sensitivity
+Contributing factors
+
+This provides engineers with a structured failure fingerprint rather than only a PASS/FAIL label.
+
+4. What Changed?
+
+Compares successful and failed execution scenarios.
+
+The analysis can highlight changes in:
+
+Configuration parameters
+Telemetry
+Risk score
+Execution behavior
+
+This helps answer:
+
+"What was different when the system failed?"
+
+5. Configuration What-If Analysis
+
+Engineers can modify configuration parameters and observe how the model's predicted failure risk changes.
+
+Example:
+
+Current Configuration
+        │
+        ▼
+Modify thread_count
+        │
+        ▼
+Modify queue_depth
+        │
+        ▼
+Modify cache_policy
+        │
+        ▼
+Recalculate Predicted Risk
+
+Note: The current implementation is a configuration-risk estimator, not a physics-based system simulator.
+
+6. Randomization & Determinism Analysis
+
+Analyzes randomized execution variables and seed-group behavior.
+
+The system provides:
+
+Randomization impact ranking
+Seed-group failure-rate analysis
+Repeatability analysis
+Determinism assessment
+
+The prototype explicitly reports when the available data is insufficient to establish deterministic behavior reliably.
+
+7. Configuration Recommendations
+
+Engineers can specify a maximum acceptable predicted failure risk.
+
+ConfigPilot then:
+
+Applies the risk constraint.
+Evaluates historical configuration candidates.
+Filters candidates exceeding the selected predicted-risk budget.
+Ranks remaining candidates using observed historical performance.
+Presents the strongest historical candidate.
+
+Recommendation wording:
+"Top historical candidate under the selected predicted-risk constraint."
+
+Recommendations are decision-support suggestions, not guarantees of future success.
+
+8. 🤖 Ask ConfigPilot
+
+ConfigPilot provides a natural-language interface for querying the analytics engine.
+
+Example questions:
+
+What configuration settings influence failure the most?
+
+Which configurations have the best performance?
+
+Which randomization parameters matter most?
+
+Are failures deterministic or random?
+
+Can future failures be predicted?
+
+Recommend a configuration below 5% predicted failure risk.
+
+What does the 29% threshold mean?
+
+Is this a physics simulator?
+
+The current prototype uses a lightweight deterministic intent engine that routes questions to the corresponding analytics and ML functionality.
+
+🏗️ Architecture
+System Architecture
+
+Architecture diagram placeholder:
+Add your final architecture diagram at:
+
+docs/images/configpilot_architecture.png
+
+Production-Oriented Architecture
+┌───────────────────────────────┐
+│   Execution Environment       │
+│                               │
+│ Configurations + Workloads    │
+│ Telemetry + Execution Logs    │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Data Collection / Export      │
+│ Layer                         │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ ConfigPilot Data Ingestion    │
+│                               │
+│ Validation                    │
+│ Parsing                       │
+│ Normalization                 │
+│ Feature Extraction            │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ AI / ML Reliability Engine   │
+│                               │
+│ Failure Prediction            │
+│ Feature Importance             │
+│ Sensitivity Analysis           │
+│ Randomization Analysis        │
+└───────────────┬───────────────┘
+                │
+       ┌────────┼────────┐
+       ▼        ▼        ▼
+   Explain   What-If   Recommend
+       │        │        │
+       └────────┼────────┘
+                ▼
+┌───────────────────────────────┐
+│ ConfigPilot Dashboard         │
+│                               │
+│ Insights + Alerts + Actions   │
+└───────────────────────────────┘
+Deployment Model
+
+The current prototype uses synthetic execution data.
+
+In a production deployment, the ingestion layer can connect to an organization's permitted execution-data source, such as:
+
+Existing logging infrastructure
+Exported CSV/JSON execution records
+Test environments
+Simulation environments
+Approved data pipelines
+
+The model can then be retrained and validated using organization-specific historical execution data.
+
+📸 Screenshots
+Dashboard Overview
+
+Screenshot placeholder: Add dashboard screenshot here.
+
+Configuration Intelligence
+
+Screenshot placeholder: Add feature-importance screenshot here.
+
+Failure Risk Prediction
+
+Screenshot placeholder: Add prediction page screenshot here.
+
+Failure Detective
+
+Screenshot placeholder: Add failure-analysis screenshot here.
+
 What-If Analysis
-      ↓
+
+Screenshot placeholder: Add what-if screenshot here.
+
 Configuration Recommendations
-      ↓
-Engineering Decision
-```
 
-✅ Challenge Requirements Compliance
-ConfigPilot addresses the major analytical requirements of the challenge through an integrated reliability intelligence workflow.
+Screenshot placeholder: Add recommendation screenshot here.
 
-| Requirement | Status | Implementation |
-|---|---|---|
-| Configuration analysis | ✅ | Configuration Intelligence |
-| Failure prediction | ✅ | Random Forest risk prediction |
-| Failure factor analysis | ✅ | Feature importance + sensitivity analysis |
-| Configuration comparison | ✅ | What Changed? |
-| Randomization analysis | ✅ | Randomization & Determinism |
-| Failure investigation | ✅ | Failure Detective |
-| Configuration recommendations | ✅ | Risk-constrained historical recommender |
-| What-if analysis | ✅ | Configuration risk estimator |
-| Interactive dashboard | ✅ | Streamlit application |
-| Natural-language querying | ✅ | Ask ConfigPilot |
-| Explainable AI | ✅ | Feature importance + local sensitivity |
-| Automated insights | ✅ | Integrated analytics and explanations |
-| Documentation | ✅ | README + methodology documentation |
+Ask ConfigPilot
+
+Screenshot placeholder: Add copilot screenshot here.
 
 📊 Dataset
-The current prototype uses organizer-approved synthetic execution data.
+
+The current prototype uses an organizer-approved synthetic execution dataset.
 
 The challenge organizers instructed participants to generate the dataset using an LLM because the underlying execution data could not be distributed due to NDA and infrastructure constraints.
 
-Therefore, ConfigPilot uses synthetic execution records to demonstrate the complete analytical and AI/ML pipeline.
+Dataset Summary
+Property	Value
+Execution records	4,939
+Total columns	114
+PASS executions	4,289
+FAIL executions	650
+Predictive features	60
+Numeric features	48
+Categorical features	12
+Missing values	0
+Duplicate run IDs	0
+Data Split
+Dataset	Samples	Failures
+Training	3,160	416
+Validation	791	104
+Test	988	130
 
-**Current Dataset**
+The split is stratified to preserve the failure ratio across datasets.
 
-| Property | Value |
-|---|---|
-| Execution records | 4,939 |
-| Total columns | 114 |
-| PASS executions | 4,289 |
-| FAIL executions | 650 |
-| PASS rate | 86.8% |
-| FAIL rate | 13.2% |
-| Missing values | 0 |
-| Duplicate run IDs | 0 |
-| Predictive features | 60 |
-| Numeric features | 48 |
-| Categorical features | 12 |
+🔬 AI/ML Methodology
+Feature Preparation
 
-The dataset contains configuration parameters, workload characteristics, telemetry, randomized variables, execution outcomes, and failure-related information.
+To avoid target leakage, the model does not use:
 
-📸 Screenshots
-Add screenshots of the deployed application here after deployment.
+Run identifiers
+Timestamps
+Random seeds
+Seed groups
+Final PASS/FAIL labels
+Failure types
+Execution logs
+Post-outcome metrics
+Ground-truth auxiliary fields
 
-🏠 Dashboard Overview
-The dashboard provides an executive-level summary of the execution dataset, model performance, and available reliability intelligence modules.
+The predictive feature matrix contains:
 
-[ Add Dashboard Screenshot ]
+60 pre-failure features
 
-🧠 Configuration Intelligence
-Ranks configuration and telemetry features according to their contribution to the predictive model.
+including:
 
-[ Add Configuration Intelligence Screenshot ]
+Configuration parameters
+Workload characteristics
+Resource metrics
+Performance indicators
+Environmental variables
+Randomization-related inputs
+Model
+Random Forest Classifier
+Algorithm: Random Forest
+Number of Trees: 300
+Class Weight: Balanced
+Random State: 42
+Categorical Encoding: One-Hot Encoding
 
-🎯 Failure Risk Prediction
-Allows engineers to evaluate an execution configuration and obtain:
+The pipeline uses:
 
-- Failure probability
-- PASS/FAIL prediction
-- Risk level
-- Influential factors
-
-[ Add Failure Risk Screenshot ]
-
-🔎 Failure Detective
-Provides a deeper investigation view for execution failures, including telemetry, prediction results, sensitivity information, and contributing factors.
-
-[ Add Failure Detective Screenshot ]
-
-🔄 What Changed?
-Compares successful and failed executions to identify differences in:
-
-- Configuration
-- Telemetry
-- Risk
-- Execution behavior
-- Logs
-
-[ Add What Changed Screenshot ]
-
-🎛️ What-If Analysis
-Allows engineers to modify configuration parameters and observe how the model's predicted failure risk changes.
-
-[ Add What-If Screenshot ]
-
-💡 Configuration Recommendations
-Finds historical configurations that satisfy a user-defined predicted-risk constraint and ranks them using observed historical performance.
-
-[ Add Recommendation Screenshot ]
-
-🚀 Core Features
-
-**1. 🧠 Configuration Intelligence**
-
-Identifies parameters the trained model relies on most strongly when distinguishing PASS and FAIL executions.
-
-The system provides:
-- Ranked feature importance
-- Feature-level observations
-- High/low percentile indicators
-- Local sensitivity analysis
-- Engineering-oriented explanations
-
-> Important: Model feature importance indicates predictive reliance. It does not prove that a feature is causally responsible for failures.
-
-**2. 🎯 Failure Risk Prediction**
-
-ConfigPilot uses a machine-learning pipeline to estimate the probability of execution failure.
-
-For a given configuration, the system provides:
-
-```
+Raw Data
+   │
+   ▼
+ColumnTransformer
+   │
+   ├── Numeric → Passthrough
+   │
+   └── Categorical → One-Hot Encoding
+   │
+   ▼
+Random Forest
+   │
+   ▼
 Failure Probability
-        ↓
-Risk Classification
-        ↓
-PASS / FAIL Prediction
-        ↓
-Explanation
-```
+📈 Model Evaluation
 
-The prediction engine uses a Random Forest classifier with 300 trees.
+The decision threshold was selected using the validation set only, maximizing F1 score through precision-recall analysis.
 
-**3. 🔎 Failure Detective**
+Selected Threshold
 
-Failure Detective provides an investigation-oriented view of an execution.
+29.00% predicted failure probability
 
-It combines:
-- Predicted failure probability
-- Actual execution outcome
-- Telemetry
-- Feature observations
-- Local sensitivity
-- Influential factors
+Held-Out Test Performance
+Metric	Result
+Accuracy	83.3%
+Macro F1	0.706
+FAIL Recall	66.92%
+Confusion Matrix
+                 Predicted
+                 PASS   FAIL
+Actual PASS       736    122
+Actual FAIL        43     87
 
-This helps engineers move from:
+The model correctly identifies 87 of 130 failures in the held-out synthetic test set.
 
-"The execution failed."
+These results demonstrate the functionality of the prototype on synthetic data and should not be interpreted as production or real-world performance.
 
-toward:
+🔍 Explainability
 
-"What signals and configuration characteristics were associated with this failure?"
+ConfigPilot provides both global and local explanations.
 
-**4. 🔄 What Changed?**
+Global Explanation
 
-What Changed? compares successful and failed executions to identify meaningful differences.
+Identifies which features the model relies on most strongly across the dataset.
 
-The comparison can include:
-- Configuration parameters
-- Telemetry metrics
-- Risk score
-- Execution logs
-- Configuration deltas
+Local Explanation
 
-This supports faster debugging and failure investigation.
+For an individual execution, the system examines:
 
-**5. 🎛️ What-If Configuration Analysis**
+Feature values
+Percentile-based observations
+Local sensitivity to feature changes
 
-Engineers can modify selected configuration parameters and evaluate the resulting predicted failure risk.
+Example:
 
-Supported configuration dimensions include:
-- Workload type
-- Traffic intensity
-- Cache size
-- Cache policy
-- Memory allocation
-- Memory policy
-- Thread count
-- CPU cores
-- Queue depth
-- I/O parallelism
-- Request size
-- I/O scheduler
-- Read/write ratio
+Feature
+   │
+   ▼
+Observed Value
+   │
+   ▼
+Dataset Percentile
+   │
+   ▼
+Sensitivity Analysis
+   │
+   ▼
+Human-Readable Insight
 
-Example workflow:
+Feature importance and sensitivity are model-based signals and do not establish causal relationships.
 
-```
-Current Configuration
-        ↓
-Change Parameter
-        ↓
-Run Model Prediction
-        ↓
-Compare Predicted Risk
-        ↓
-Evaluate Configuration
-```
+🧪 Configuration What-If Analysis
 
-> Important: The current what-if module is a configuration-risk estimator, not a physics-based performance simulator.
+ConfigPilot supports experimentation with controllable configuration parameters.
 
-**6. 🎲 Randomization & Determinism Analysis**
+Current configurable parameters include:
 
-ConfigPilot analyzes randomized execution variables to investigate whether failures appear associated with particular randomization conditions.
+workload_type
+traffic_intensity
+cache_size_mb
+cache_policy
+memory_allocation_mb
+memory_policy
+thread_count
+cpu_cores
+queue_depth
+io_parallelism
+request_size_kb
+io_scheduler
+read_write_ratio
 
-The module provides:
-- Randomization feature impact ranking
-- Seed-group failure analysis
-- Failure-rate comparisons
-- Repeatability-oriented analysis
+The system changes selected parameters while keeping the remaining execution context fixed and evaluates the resulting predicted risk.
 
-The prototype also explicitly reports when the available data is insufficient to establish deterministic behavior reliably.
+This enables engineers to ask:
 
-**7. 💡 Configuration Recommendations**
+"If I change this configuration, does the model consider the execution more or less risky?"
 
-The recommendation engine allows engineers to specify a maximum acceptable predicted failure risk.
+🏆 Recommendation Engine
 
-The system then:
+The recommendation engine uses a user-defined predicted-risk constraint.
 
-```
-Risk Constraint
-      ↓
-Historical Configurations
-      ↓
-Predict Risk
-      ↓
-Filter Candidates
-      ↓
-Rank by Historical Performance
-      ↓
-Recommend Candidate
-```
+Example:
 
-The recommendation is presented as:
-
-"Top historical candidate under the selected predicted-risk constraint."
-
-Recommendations are not presented as guarantees.
-
-**8. 🤖 Ask ConfigPilot**
-
-Ask ConfigPilot provides a natural-language interface for interacting with the platform.
-
-Example questions:
-- What configuration settings influence failure the most?
-- Which configurations have the best performance?
-- Which randomization parameters matter most?
-- Are failures deterministic or random?
-- Can future failures be predicted?
-- Recommend a configuration below 5% predicted failure risk.
-- What does the 29% threshold mean?
-- Is this a physics simulator?
-
-The current implementation uses a deterministic intent engine that maps natural-language questions to the platform's existing analytical functions.
-
-This keeps the prototype functional without requiring an external LLM API at runtime.
-
-🤖 AI/ML Capabilities
-ConfigPilot combines several analytical techniques into one reliability workflow.
-
-**Machine Learning**
-- Random Forest classification
-- Probability-based failure prediction
-- Class balancing
-- Validation-based threshold selection
-
-**Explainable AI**
-- Global feature importance
-- Percentile-based observations
-- Local sensitivity analysis
-
-**Statistical Analysis**
-- Failure-rate analysis
-- Feature comparisons
-- Randomization impact analysis
-- Configuration comparisons
-
-**Recommendation Intelligence**
-- Predicted-risk filtering
-- Historical configuration search
-- Performance-based ranking
-
-**Natural Language Interaction**
-- Intent detection
-- Query routing
-- Human-readable analytical responses
-
-🛠 Technology Stack
-
-**Programming & Data**
-
-| Technology | Purpose |
-|---|---|
-| Python | Core development |
-| Pandas | Data processing |
-| NumPy | Numerical operations |
-| Scikit-learn | Machine learning |
-| Joblib | Model persistence |
-
-**Machine Learning**
-
-| Component | Implementation |
-|---|---|
-| Model | Random Forest Classifier |
-| Trees | 300 |
-| Class balancing | Balanced class weights |
-| Categorical encoding | One-Hot Encoding |
-| Threshold selection | Validation-set F1 optimization |
-| Prediction output | Failure probability + risk classification |
-
-**Application**
-
-| Technology | Purpose |
-|---|---|
-| Streamlit | Interactive web dashboard |
-| Python modules | Modular backend architecture |
-| Git | Version control |
-| GitHub | Source-code hosting |
-
-🏗 Project Architecture
-ConfigPilot follows a modular architecture separating data processing, machine learning, explainability, analysis, recommendations, and user interaction.
-
-```
-                 ┌──────────────────────────┐
-                 │   Execution Data Source  │
-                 │ CSV / Exported Logs /    │
-                 │ Simulator / Collection   │
-                 └────────────┬─────────────┘
-                              │
-                              ▼
-                 ┌──────────────────────────┐
-                 │ Data Ingestion &          │
-                 │ Validation                │
-                 └────────────┬─────────────┘
-                              │
-                              ▼
-                 ┌──────────────────────────┐
-                 │ Feature Extraction &      │
-                 │ Normalization             │
-                 └────────────┬─────────────┘
-                              │
-                              ▼
-                 ┌──────────────────────────┐
-                 │ AI / ML Reliability      │
-                 │ Engine                   │
-                 │                          │
-                 │ Random Forest            │
-                 │ Risk Prediction          │
-                 └────────────┬─────────────┘
-                              │
-             ┌────────────────┼─────────────────┐
-             ▼                ▼                 ▼
-      ┌─────────────┐  ┌─────────────┐  ┌──────────────┐
-      │Explainability│  │ Reliability │  │ Configuration│
-      │& Sensitivity │  │ Analytics   │  │ Intelligence │
-      └──────┬──────┘  └──────┬──────┘  └──────┬───────┘
-             │                │                 │
-             └────────────────┼─────────────────┘
-                              ▼
-                 ┌──────────────────────────┐
-                 │ What-If & Recommendation │
-                 │ Engine                   │
-                 └────────────┬─────────────┘
-                              │
-                              ▼
-                 ┌──────────────────────────┐
-                 │     ConfigPilot UI       │
-                 │ Dashboard + AI Copilot   │
-                 └──────────────────────────┘
-```
-
-**Production Deployment Path**
-
-The prototype is designed so that the synthetic dataset can be replaced by an organization-permitted execution-data source.
-
-```
-Organization Execution Environment
+Maximum predicted failure risk
               ↓
-Log / Data Export or Collection Layer
+             5%
               ↓
-ConfigPilot Data Ingestion
+Historical configurations
               ↓
-Validation & Feature Extraction
+Risk filtering
               ↓
-Organization-Specific Model Training
+Performance ranking
               ↓
-Risk Prediction & Explainability
-              ↓
-Recommendations & Engineering Insights
-```
+Top historical candidate
 
-The production architecture does not depend on the challenge organizers supplying real-time data.
+The recommendation is based on historical evidence available in the dataset.
 
-📂 Project Structure
-The project follows a modular structure to keep the codebase organized, maintainable, and scalable.
+It is not presented as a guaranteed optimal or guaranteed-safe configuration.
 
-```
-ConfigPilot/
+🧩 Technology Stack
+Category	Technology
+Language	Python
+Dashboard	Streamlit
+Machine Learning	Scikit-learn
+Data Processing	Pandas
+Numerical Computing	NumPy
+Model	Random Forest
+Encoding	One-Hot Encoding
+Visualization	Streamlit Charts / Plotting
+Version Control	Git / GitHub
+Deployment	Streamlit Community Cloud
+📁 Project Structure
+SandDisk/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+├── .gitignore
 │
 ├── data/
 │   └── synthetic_execution_logs_10000.csv
 │
 ├── models/
-│   ├── sanddisk_config_features.pkl
 │   ├── sanddisk_failure_model.pkl
-│   └── sanddisk_threshold.pkl
+│   ├── sanddisk_threshold.pkl
+│   └── sanddisk_config_features.pkl
 │
 ├── src/
 │   ├── __init__.py
-│   ├── chatbot.py
-│   ├── explanation.py
-│   ├── prediction.py
 │   ├── preprocessing.py
-│   ├── recommender.py
-│   ├── similarity.py
 │   ├── train_model.py
+│   ├── prediction.py
+│   ├── explanation.py
 │   ├── what_if.py
-│   ├── test_engine.py
-│   └── test_full_pipeline.py
+│   ├── similarity.py
+│   ├── recommender.py
+│   └── chatbot.py
 │
-├── app.py
-├── requirements.txt
-├── README.md
-├── implementation_plan.md
-└── .gitignore
-```
-
-**Module Responsibilities**
-
-| Module | Purpose |
-|---|---|
-| app.py | Streamlit application and UI |
-| preprocessing.py | Feature preparation and preprocessing |
-| train_model.py | Model training pipeline |
-| prediction.py | Failure-risk prediction |
-| explanation.py | Feature importance and sensitivity |
-| what_if.py | Configuration what-if analysis |
-| similarity.py | Configuration similarity |
-| recommender.py | Risk-constrained recommendations |
-| chatbot.py | Ask ConfigPilot intent handling |
-
-📊 Dataset & Methodology
-
-**Feature Selection**
-
-The model uses pre-failure / configuration-relevant features while explicitly removing fields that could leak the outcome.
-
-Excluded fields include:
-- run_id
-- timestamp
-- random_seed
-- seed_group
-- pass_fail
-- failure_type
-- execution_log
-- Auxiliary configuration fields
-- Post-outcome failure indicators
-
-Post-outcome fields such as:
-- error_count
-- timeout_count
-- recovery_events
-- data_integrity_errors
-- watchdog_events
-- reliability_score
-- performance_score
-
-are excluded from prediction to reduce target leakage.
-
-**Train / Validation / Test Split**
-
-The dataset is divided using stratified sampling.
-
-| Split | Samples |
-|---|---|
-| Training | 3,160 |
-| Validation | 791 |
-| Test | 988 |
-
-The validation set is used for threshold selection, while the test set remains untouched during threshold optimization.
-
-⚙️ Installation & Setup Instructions
-Follow the steps below to run ConfigPilot locally.
-
-**Prerequisites**
-
-Make sure the following software is installed:
-- Python 3.x
-- pip
-- Git
-
-**Clone the Repository**
-
-```
-git clone <GitHub repository URL>
-cd ConfigPilot
-```
-
-**Install Dependencies**
-
-```
+└── docs/
+    └── images/
+        ├── configpilot_architecture.png
+        ├── dashboard.png
+        ├── configuration_intelligence.png
+        ├── failure_prediction.png
+        ├── failure_detective.png
+        ├── what_if.png
+        ├── recommendations.png
+        └── ask_configpilot.png
+⚙️ Installation & Setup
+1. Clone the Repository
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd SandDisk
+2. Create a Virtual Environment
+Windows
+python -m venv venv
+venv\Scripts\activate
+macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+3. Install Dependencies
 pip install -r requirements.txt
-```
-
-**Train the Model** (if model artifacts are not already present in `/models`)
-
-```
-python src/train_model.py
-```
-
-**Run the Application**
-
-```
+4. Run ConfigPilot
 streamlit run app.py
-```
 
-Open your browser and visit the local URL shown in the terminal (typically `http://localhost:8501`).
+The application will open in your browser.
 
-**Run Tests**
+▶️ Usage
+Dashboard
 
-```
-python src/test_engine.py
-python src/test_full_pipeline.py
-```
+Start with the Dashboard Overview to understand:
 
-🎯 Model Evaluation
-The prototype uses a Random Forest classifier with 300 trees.
+Dataset size
+PASS/FAIL distribution
+Model performance
+Decision threshold
+Available capabilities
+Analyze Configuration Risk
 
-The decision threshold was selected on the validation set using F1 maximization, resulting in:
+Navigate to:
 
-**Decision threshold: 29.00%**
+Failure Risk Prediction
 
-**Held-Out Test Performance**
+Enter configuration parameters and obtain:
 
-| Metric | Result |
-|---|---|
-| Accuracy | 83.3% |
-| Macro F1 | 0.706 |
-| FAIL Recall | 66.92% |
-| Test failures detected | 87 / 130 |
+Failure probability
+Risk level
+PASS/FAIL prediction
+Investigate Failures
 
-**Confusion Matrix**
+Use:
 
-```
-                    Predicted
-                 PASS       FAIL
+Failure Detective
 
-Actual PASS       736        122
-Actual FAIL        43         87
-```
+to inspect individual execution behavior.
 
-The prototype emphasizes FAIL recall and failure-oriented metrics rather than relying only on overall accuracy.
+Compare Executions
 
-> Important: These metrics are measured on the current synthetic dataset and should not be interpreted as real-world production performance.
+Use:
 
-🔍 Explainability & Reliability Intelligence
-ConfigPilot does not treat a prediction as a black-box answer.
+What Changed?
 
-The platform combines:
+to identify differences between execution scenarios.
 
-```
-Prediction
-    +
-Feature Importance
-    +
-Input Observation
-    +
-Local Sensitivity
-    +
-Historical Evidence
-    =
-Engineering-Oriented Explanation
-```
+Explore Configurations
 
-**Global Explanation**
+Use:
 
-Shows which features the model relies on most strongly across the dataset.
+What-If Analysis
 
-**Local Explanation**
+to evaluate predicted risk under modified configurations.
 
-Evaluates how small changes in selected inputs affect the model's predicted failure probability.
+Get Recommendations
 
-**Observation Context**
+Use:
 
-Features are categorized according to their observed percentile:
-- VERY LOW
-- LOW
-- NORMAL
-- HIGH
-- VERY HIGH
+Configuration Recommendations
 
-These observations provide context for the prediction but are not treated as automatic causal explanations.
+to search historical candidates under a selected predicted-risk constraint.
 
-⚠️ Limitations & Responsible Interpretation
-ConfigPilot is currently a functional proof-of-concept, not a production-certified reliability system.
+Ask ConfigPilot
 
-**Synthetic Dataset**
+Use natural-language questions through:
 
-The current prototype uses organizer-approved synthetic execution data because the underlying execution data could not be distributed due to NDA and infrastructure constraints.
-
-**Feature Importance ≠ Causality**
-
-A highly important feature means the model relies on it for prediction. It does not prove that changing that feature alone causes a failure.
-
-**What-If ≠ Physics Simulation**
-
-The current what-if engine estimates how configuration changes affect predicted failure risk.
-
-It does not model physical system behavior or guarantee changes in actual throughput, latency, or hardware performance.
-
-**Recommendations ≠ Guarantees**
-
-Recommended configurations are historical candidates satisfying the selected predicted-risk constraint.
-
-They are not guaranteed to be globally optimal or physically safe.
-
-**Determinism Analysis**
-
-The current dataset does not contain enough exact repeated 13-parameter trials to establish deterministic failure behavior reliably.
-
-Therefore, ConfigPilot reports the limitation rather than making an unsupported deterministic/random conclusion.
-
-🚀 Future Enhancements
-ConfigPilot is designed to evolve from a synthetic-data prototype into an organization-specific reliability intelligence platform.
-
-- 🔌 **Organization Data Integration** – Connect to permitted execution-log exports, test environments, simulators, or existing data infrastructure.
-- 🧠 **Organization-Specific Model Training** – Retrain and calibrate models using organization-specific historical execution data.
-- 📈 **Time-Series Failure Prediction** – Add temporal models for detecting early degradation and predicting failures before execution completion.
-- 🔬 **Advanced Explainable AI** – Integrate advanced explainability techniques such as SHAP-based local and global explanations.
-- 🔗 **Causal Analysis** – Introduce causal inference techniques to distinguish predictive correlation from actual configuration effects.
-- 🧪 **Experiment Tracking** – Track configuration experiments and compare predicted versus observed outcomes over time.
-- 📊 **Pareto Optimization** – Expand recommendation logic to optimize multiple objectives such as:
-
-```
-Failure Risk
-      ↕
-Throughput
-      ↕
-Latency
-      ↕
-Resource Utilization
-```
-
-- 🔄 **Continuous Monitoring** – Support model monitoring, drift detection, recalibration, and automated retraining pipelines.
-- 🤖 **Advanced AI Copilot** – Extend Ask ConfigPilot with an LLM-based engineering assistant while retaining deterministic analytical functions underneath.
-
-👥 Contributors
-Developed as a team project for the SandDisk Challenge.
-
-| Contributor | Role |
-|---|---|
-| Add Name | AI/ML & Reliability Analytics |
-| Add Name | Application & Dashboard |
-| Add Name | Data Engineering |
-| Add Name | Research & Documentation |
-
-📄 License
-This project was developed as a prototype submission for the SandDisk Challenge.
-
-Add your preferred open-source license here if required by your team or challenge rules.
-
-🙏 Acknowledgements
-Special thanks to the challenge organizers for providing the problem context and permitting participants to generate synthetic datasets for prototyping under the stated NDA and infrastructure constraints.
-
-We also acknowledge the open-source technologies that made this prototype possible:
-
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Streamlit
-- Joblib
-- Git
-- GitHub
-
-⚙️ ConfigPilot: AI Configuration & Reliability Copilot
-Predict. Explain. Simulate. Recommend.
-
-Built for the SandDisk Challenge
+Ask ConfigPilot                    
