@@ -152,6 +152,7 @@ AI / ML Reliability Engine
                               │
                               ▼
                     Engineer Decision Support
+```
 ## 🧠 Key Features
 
 ### Dashboard
@@ -239,6 +240,7 @@ Modify cache_policy
         │
         ▼
 Recalculate Predicted Risk
+```
 
 Current configurable parameters include:
 workload_type
@@ -418,6 +420,7 @@ Production-Oriented Architecture
 │                               │
 │ Insights + Alerts + Actions   │
 └───────────────────────────────┘
+```
 Deployment Model
 The current prototype uses synthetic execution data.
 In a production deployment, the ingestion layer can connect to an organization's permitted execution-data source, such as:
