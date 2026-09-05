@@ -154,65 +154,47 @@ AI / ML Reliability Engine
                     Engineer Decision Support
 🧠 Key Features
 1. Configuration Intelligence
-
 Identifies configuration and execution variables that the predictive model relies on most strongly.
-
 Provides:
-
 Ranked feature importance
 Configuration impact insights
 Feature-level observations
 Model-based explanations
-
 Important: Feature importance indicates model reliance and should not be interpreted as proof of causality.
 
 2. Failure Risk Prediction
-
 Predicts the probability that an execution will fail.
-
 Output
 Failure probability
 PASS / FAIL prediction
 Risk level
 Configurable decision threshold
 Explainability information
-
 The prototype uses a Random Forest classifier with 300 trees.
 
 3. Failure Detective
-
 Investigates individual execution failures by combining:
-
 Prediction
 Actual execution outcome
 Telemetry
 Configuration values
 Feature sensitivity
 Contributing factors
-
 This provides engineers with a structured failure fingerprint rather than only a PASS/FAIL label.
 
 4. What Changed?
-
 Compares successful and failed execution scenarios.
-
 The analysis can highlight changes in:
-
 Configuration parameters
 Telemetry
 Risk score
 Execution behavior
-
 This helps answer:
-
 "What was different when the system failed?"
 
 5. Configuration What-If Analysis
-
 Engineers can modify configuration parameters and observe how the model's predicted failure risk changes.
-
 Example:
-
 Current Configuration
         │
         ▼
@@ -230,57 +212,37 @@ Recalculate Predicted Risk
 Note: The current implementation is a configuration-risk estimator, not a physics-based system simulator.
 
 6. Randomization & Determinism Analysis
-
 Analyzes randomized execution variables and seed-group behavior.
-
 The system provides:
-
 Randomization impact ranking
 Seed-group failure-rate analysis
 Repeatability analysis
 Determinism assessment
-
 The prototype explicitly reports when the available data is insufficient to establish deterministic behavior reliably.
 
 7. Configuration Recommendations
-
 Engineers can specify a maximum acceptable predicted failure risk.
-
 ConfigPilot then:
-
 Applies the risk constraint.
 Evaluates historical configuration candidates.
 Filters candidates exceeding the selected predicted-risk budget.
 Ranks remaining candidates using observed historical performance.
 Presents the strongest historical candidate.
-
 Recommendation wording:
 "Top historical candidate under the selected predicted-risk constraint."
-
 Recommendations are decision-support suggestions, not guarantees of future success.
 
 8. 🤖 Ask ConfigPilot
-
 ConfigPilot provides a natural-language interface for querying the analytics engine.
-
 Example questions:
-
 What configuration settings influence failure the most?
-
 Which configurations have the best performance?
-
 Which randomization parameters matter most?
-
 Are failures deterministic or random?
-
 Can future failures be predicted?
-
 Recommend a configuration below 5% predicted failure risk.
-
 What does the 29% threshold mean?
-
 Is this a physics simulator?
-
 The current prototype uses a lightweight deterministic intent engine that routes questions to the corresponding analytics and ML functionality.
 
 🏗️ Architecture
