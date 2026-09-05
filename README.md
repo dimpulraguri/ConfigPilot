@@ -259,7 +259,7 @@ read_write_ratio
 Important: The current implementation is a configuration-risk estimator, not a physics-based system simulator.
 It estimates how the predictive model responds to configuration changes; it does not claim to simulate physical system behavior.
 
-7. Performance & Trade-offs
+#### 7. Performance & Trade-offs
 Provides configuration-performance context using historical execution evidence available in the dataset.
 Engineers can use this view to understand the relationship between:
 Predicted failure risk
@@ -269,8 +269,8 @@ Observed execution outcomes
 The prototype uses observed historical performance for comparison and recommendation.
 It does not claim to simulate future throughput or latency from first principles, and it does not guarantee that historical performance will be reproduced in future executions.
 
-Reliability
-8. Failure Detective
+### Reliability
+#### 8. Failure Detective
 Investigates individual execution failures by combining multiple signals into a structured failure fingerprint.
 The analysis can combine:
 Model prediction
@@ -281,7 +281,7 @@ Feature sensitivity
 Contributing factors
 This helps engineers move beyond a simple PASS/FAIL label and investigate the configuration and execution context associated with a failure.
 
-9. What Changed?
+####  9. What Changed?
 Compares successful and failed execution scenarios to identify meaningful differences.
 The analysis can highlight changes in:
 Configuration parameters
@@ -292,7 +292,7 @@ This helps answer the engineering question:
 "What was different when the system failed?"
 The analysis is intended to surface useful differences for investigation rather than claim that every identified difference is causally responsible for the failure.
 
-10. Configuration Intelligence
+#### 10. Configuration Intelligence
 Identifies configuration and execution variables that the predictive model relies on most strongly.
 Provides:
 Ranked feature importance
@@ -302,7 +302,7 @@ Model-based explanations
 Feature importance indicates model reliance, not causality.
 A highly ranked feature should therefore be treated as a signal for engineering investigation rather than proof that changing that feature will directly cause or prevent a failure.
 
-11. Randomization & Determinism
+#### 11. Randomization & Determinism
 Analyzes randomized execution variables and seed-group behavior to investigate whether observed failures appear associated with randomized execution conditions.
 Provides:
 Randomization impact ranking
@@ -311,8 +311,8 @@ Repeatability analysis
 Determinism assessment
 The prototype explicitly reports when the available data is insufficient to establish deterministic behavior reliably.
 
-Governance
-12. Methodology & Audit
+### Governance
+#### 12. Methodology & Audit
 Provides transparency into how ConfigPilot prepares data, generates predictions, evaluates the model, and handles prototype limitations.
 Documents:
 Dataset provenance
@@ -329,8 +329,7 @@ Known limitations
 The predictive feature matrix contains 60 intended pre-failure features.
 The leakage audit structurally verifies that excluded identifiers, auxiliary fields, post-outcome symptom fields, and other prohibited fields do not enter the predictive feature matrix.
 The current prototype uses organizer-approved synthetic challenge data and should not be interpreted as production-validated real-world performance.
-
-⚙️ Model Summary
+### ⚙️ Model Summary
 Random Forest (300 Trees) | Decision Threshold: 29.00%
 Metric	Result
 Accuracy	83.3%
@@ -488,7 +487,7 @@ The model can then be retrained and validated using organization-specific histor
 ### 🛡️ Methodology & Audit
 
 ![Methodology & Audit](docs/screenshots/12%20methodology%20nd%20audit.png)
-📊 Dataset
+### 📊 Dataset
 The current prototype uses an validated synthetic execution dataset.
 The challenge organizers instructed participants to generate the dataset using an LLM because the underlying execution data could not be distributed due to NDA and infrastructure constraints.
 Dataset Summary
@@ -509,7 +508,7 @@ Validation	791	104
 Test	988	130
 The split is stratified to preserve the failure ratio across datasets.
 
-🔬 AI/ML Methodology
+### 🔬 AI/ML Methodology
 Feature Preparation
 To avoid target leakage, the model does not use:
 Run identifiers
@@ -555,7 +554,7 @@ Random Forest
    ▼
 Failure Probability
 
-📈 Model Evaluation
+### 📈 Model Evaluation
 The decision threshold was selected using the validation set only, maximizing F1 score through precision-recall analysis.
 Selected Threshold
 29.00% predicted failure probability
@@ -574,7 +573,7 @@ Actual FAIL        43     87
 The model correctly identifies 87 of 130 failures in the held-out synthetic test set.
 These results demonstrate the functionality of the engineering prototype on synthetic data and should not be interpreted as production or real-world performance.
 
-🔍 Explainability
+### 🔍 Explainability
 ConfigPilot provides both global and local explanations.
 Global Explanation
 Identifies which features the model relies on most strongly across the dataset.
@@ -600,7 +599,7 @@ Sensitivity Analysis
 Human-Readable Insight
 Feature importance and sensitivity are model-based signals and do not establish causal relationships.
 
-🧪 Configuration What-If Analysis
+### 🧪 Configuration What-If Analysis
 ConfigPilot supports experimentation with controllable configuration parameters.
 Current configurable parameters include:
 workload_type
@@ -620,7 +619,7 @@ The system changes selected parameters while keeping the remaining execution con
 This enables engineers to ask:
 "If I change this configuration, does the model consider the execution more or less risky?"
 
-🏆 Recommendation Engine
+### 🏆 Recommendation Engine
 The recommendation engine uses a user-defined predicted-risk constraint.
 Example:
 Maximum predicted failure risk
@@ -637,7 +636,7 @@ Top historical candidate
 The recommendation is based on historical evidence available in the dataset.
 It is not presented as a guaranteed optimal or guaranteed-safe configuration.
 
-🧩 Technology Stack
+### 🧩 Technology Stack
 Category	Technology
 Language	Python
 Dashboard	Streamlit
@@ -650,7 +649,7 @@ Visualization	Streamlit Charts / Plotting
 Version Control	Git / GitHub
 Deployment	Streamlit Community Cloud
 
-📁 Project Structure
+## 📁 Project Structure
 SandDisk/
 │
 ├── app.py
@@ -692,7 +691,7 @@ SandDisk/
         ├── recommendations.png
         └── ask_configpilot.png
 
-⚙️ Installation & Setup
+### ⚙️ Installation & Setup
 1. Clone the Repository
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd SandDisk
@@ -709,7 +708,7 @@ pip install -r requirements.txt
 streamlit run app.py
 The application will open in your browser.
 
-▶️ Usage
+### ▶️ Usage
 Dashboard
 Start with the Dashboard Overview to understand:
 Dataset size
