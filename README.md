@@ -25,13 +25,13 @@
 ## 🚀 Live Demo
 
 🌐 **Streamlit Application:**  
-> *Add deployed Streamlit URL here*
+> https://configpilot-ai.streamlit.app
 
 🎥 **Demo Video:**  
 > *Add 5-minute demo video link here*
 
 💻 **GitHub Repository:**  
-> *Add repository URL here*
+> https://github.com/dimpulraguri/ConfigPilot
 
 ---
 
