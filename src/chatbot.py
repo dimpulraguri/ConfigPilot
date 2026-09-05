@@ -32,8 +32,39 @@ def process_sanddisk_query(
     """
     q = query.lower().strip()
     
+    # 0. Data Ingestion & Dataset Compatibility Queries
+    if any(k in q for k in ["ingest", "upload", "csv", "compatibility", "incompatible"]):
+        return {
+            "intent": "Data Ingestion & Dataset Compatibility",
+            "answer": (
+                "**Data Ingestion & Validation in ConfigPilot**:\n\n"
+                "ConfigPilot accepts external execution logs via the **Data Ingestion** command center.\n"
+                "When a dataset is uploaded, the schema validator checks required parameters, null values, run ID uniqueness, and outcome labels.\n\n"
+                "**Compatibility Levels**:\n"
+                "- **`SUPPORTED`**: All 13 controllable parameters present. Full predictions and historical analytics active.\n"
+                "- **`PARTIALLY COMPATIBLE`**: Core parameters present, minor non-essential features missing.\n"
+                "- **`INCOMPATIBLE`**: Required model features missing. Predictions are safely disabled with detailed diagnostics rather than crashing."
+            ),
+            "data_type": "text",
+            "data": None,
+        }
+
+    # 0b. Multi-User & Workspace Architecture Queries
+    elif any(k in q for k in ["workspace", "tenant", "multi-user", "acme"]):
+        return {
+            "intent": "Workspace & Multi-Tenant Architecture",
+            "answer": (
+                "**Workspace Architecture Concept**:\n\n"
+                "ConfigPilot supports workspace-isolated environments (e.g., `Acme Storage (Workspace)`).\n"
+                "In production deployments, each workspace encapsulates isolated datasets, execution logs, active configurations, predictions, and reports.\n\n"
+                "*(Note: The hackathon prototype provides workspace UI context to demonstrate multi-tenant readiness).* "
+            ),
+            "data_type": "text",
+            "data": None,
+        }
+
     # 1. Physics Simulator Disclaimer
-    if any(k in q for k in ["physics", "simulator"]):
+    elif any(k in q for k in ["physics", "simulator"]):
         return {
             "intent": "What-If Simulator Disclaimer",
             "answer": (

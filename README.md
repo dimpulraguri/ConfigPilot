@@ -553,19 +553,22 @@ SandDisk/
 ├── src/
 │   ├── __init__.py
 │   ├── preprocessing.py
+│   ├── ingestion.py
 │   ├── train_model.py
 │   ├── prediction.py
 │   ├── explanation.py
 │   ├── what_if.py
 │   ├── similarity.py
 │   ├── recommender.py
-│   └── chatbot.py
+│   ├── chatbot.py
+│   ├── test_full_pipeline.py
+│   └── test_ingestion_and_pipeline.py
 │
 └── docs/
     └── images/
         ├── configpilot_architecture.png
         ├── dashboard.png
-        ├── configuration_intelligence.png
+        ├── data_ingestion.png
         ├── failure_prediction.png
         ├── failure_detective.png
         ├── what_if.png
