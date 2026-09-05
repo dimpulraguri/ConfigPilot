@@ -28,7 +28,7 @@
 > https://configpilot-ai.streamlit.app
 
 🎥 **Demo Video:**  
-> *Add 5-minute demo video link here*
+> https://youtu.be/wHG1QzGQzkM
 
 💻 **GitHub Repository:**  
 > https://github.com/dimpulraguri/ConfigPilot
@@ -690,7 +690,7 @@ SandDisk/
 
 ### ⚙️ Installation & Setup
 1. Clone the Repository
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/dimpulraguri/ConfigPilot
 cd SandDisk
 2. Create a Virtual Environment
 Windows
