@@ -369,10 +369,7 @@ Governance
 🏗️ Architecture
 System Architecture
 
-Architecture diagram placeholder:
-Add your final architecture diagram at:
-
-docs/screenshots/configpilot_architecture.png
+![ConfigPilot Architecture](docs/screenshots/configpilot_architecture.png)
 
 Production-Oriented Architecture
 ┌───────────────────────────────┐
