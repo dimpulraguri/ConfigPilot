@@ -428,35 +428,63 @@ Simulation environments
 Approved data pipelines
 The model can then be retrained and validated using organization-specific historical execution data.
 
-📸 Screenshots
-Dashboard Overview
+## 📸 Screenshots
 
-Screenshot placeholder: Add dashboard screenshot here.
+### 🏠 Home
 
-Configuration Intelligence
+![ConfigPilot Home](docs/screenshots/00%20Home%20page.png)
 
-Screenshot placeholder: Add feature-importance screenshot here.
+### 📊 Dashboard Overview
 
-Failure Risk Prediction
+![Dashboard Overview](docs/screenshots/01%20Dashboard-overview.png)
 
-Screenshot placeholder: Add prediction page screenshot here.
+### 📥 Data Ingestion & Validation
 
-Failure Detective
+![Data Ingestion & Validation](docs/screenshots/02%20Data%20Ingestion%20%26%20Validation.png)
 
-Screenshot placeholder: Add failure-analysis screenshot here.
+### 💬 Ask ConfigPilot
 
-What-If Analysis
+![Ask ConfigPilot](docs/screenshots/03%20ask%20config%20capilot.png)
 
-Screenshot placeholder: Add what-if screenshot here.
+### 🎯 Failure Risk Prediction
 
-Configuration Recommendations
+![Failure Risk Prediction](docs/screenshots/04%20failure%20risk%20prediction.png)
 
-Screenshot placeholder: Add recommendation screenshot here.
+### ⚙️ Configuration Recommendations
 
-Ask ConfigPilot
+![Configuration Recommendations](docs/screenshots/05%20configuration%20recommendation.png)
 
-Screenshot placeholder: Add copilot screenshot here.
+### 🔬 What-If Analysis
 
+![What-If Analysis](docs/screenshots/06%20wt%20if%20analysis.png)
+
+### 📈 Performance & Trade-offs
+
+![Performance & Trade-offs](docs/screenshots/07%20performance%20trade%20offs%201.png)
+
+![Performance & Trade-offs](docs/screenshots/07%20oerformance%20tradeoffs%202.png)
+
+### 🕵️ Failure Detective
+
+![Failure Detective](docs/screenshots/08%20failure%20detective%20.png)
+
+### 🔎 What Changed?
+
+![What Changed?](docs/screenshots/09%20wt%20changed%20.png)
+
+### 🧠 Configuration Intelligence
+
+![Configuration Intelligence](docs/screenshots/10%20configurations%20intelligence%201.png)
+
+![Configuration Intelligence](docs/screenshots/10%20configurations%20intelligence%202.png)
+
+### 🎲 Randomization & Determinism
+
+![Randomization & Determinism](docs/screenshots/11%20randomizations%20nd%20determinism.png)
+
+### 🛡️ Methodology & Audit
+
+![Methodology & Audit](docs/screenshots/12%20methodology%20nd%20audit.png)
 📊 Dataset
 The current prototype uses an validated synthetic execution dataset.
 The challenge organizers instructed participants to generate the dataset using an LLM because the underlying execution data could not be distributed due to NDA and infrastructure constraints.
