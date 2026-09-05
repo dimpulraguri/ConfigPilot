@@ -29,7 +29,11 @@ def test_full_pipeline():
     X, y, _, _ = prepare_feature_matrix(df)
     print(f"[OK] Artifacts loaded. Threshold = {threshold:.4f}, Rows = {len(df)}")
 
-    print("\n[2/5] Testing Prediction & Explanation Engine...")
+    print("\n[1b/5] Running Structural Feature Leakage Audit...")
+    from leakage_audit import run_feature_leakage_audit
+    leak_res = run_feature_leakage_audit(df)
+    print(f"  {leak_res['audit_summary_text']}")
+    assert leak_res["status"] == "PASS", "Leakage audit failed!"
     test_row = X.iloc[[0]]
     pred_res = predict_failure_risk(model, threshold, test_row)
     print(f"  Prediction: {pred_res['prediction']}, Prob = {pred_res['failure_probability']*100:.2f}%, Risk = {pred_res['risk_level']}")

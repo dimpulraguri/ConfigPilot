@@ -1,7 +1,7 @@
 """
 ConfigPilot — AI Configuration & Reliability Copilot
 Built for the SandDisk Challenge
-Production-Grade Reliability Engineering SaaS Application
+Validated Engineering Prototype with Leakage-Audited Inputs
 """
 
 import os
@@ -27,6 +27,7 @@ from explanation import (
     get_global_feature_importances,
 )
 from ingestion import load_execution_data, validate_dataset_schema
+from leakage_audit import run_feature_leakage_audit
 from prediction import predict_failure_risk
 from preprocessing import CONFIG_FEATURES, prepare_feature_matrix
 from recommender import recommend_safe_configurations
@@ -34,109 +35,307 @@ from similarity import find_similar_configurations
 from what_if import multi_parameter_what_if, single_parameter_what_if
 
 # ==============================================================================
-# 1. Page Configuration & Professional SaaS Styling
+# 1. Page Configuration & Linear/Vercel Design System
 # ==============================================================================
 st.set_page_config(
-    page_title="ConfigPilot — AI Configuration & Reliability Copilot",
+    page_title="ConfigPilot — Reliability Engineering Tool",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
+# Custom CSS: Slate palette (#0b0f19 canvas, single #2563eb accent, Inter typeface)
 st.markdown(
     """
     <style>
-    .main-title {
-        font-family: 'Inter', system-ui, sans-serif;
-        font-weight: 800;
-        background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 2.6rem;
-        margin-bottom: 0.1rem;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+    /* ── Global Canvas ─────────────────────────────────────────────── */
+    .stApp {
+        background: #0b0f19;
+        color: #f9fafb;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
-    .tagline {
-        font-size: 1.1rem;
+
+    /* ── Landing: balanced top bar ─────────────────────────────────── */
+    .landing-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.9rem 0 0.5rem 0;
+        border-bottom: 1px solid #1a2030;
+        margin-bottom: 0;
+    }
+    .landing-wordmark {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #f9fafb;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .landing-wordmark-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2563eb;
+        display: inline-block;
+    }
+    .landing-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.78rem;
+        color: #6b7280;
+    }
+    .landing-deploy-pill {
+        background: #1e3a8a;
+        color: #93c5fd;
+        border: 1px solid #2563eb44;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.74rem;
         font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+    .landing-kebab {
+        color: #4b5563;
+        font-size: 1rem;
+        cursor: default;
+    }
+
+    /* ── Landing: main composition block (upper-40%) ───────────────── */
+    .landing-stage {
+        max-width: 560px;
+        /* push to upper-40% of viewport: ~8vh top, let content height anchor it */
+        margin: 8vh auto 0 auto;
+        text-align: center;
+        position: relative;
+    }
+
+    /* Subtle radial glow focused on the headline — not the whole page */
+    .landing-stage::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 480px;
+        height: 260px;
+        background: radial-gradient(ellipse at center, rgba(37,99,235,0.18) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── Tagline eyebrow ───────────────────────────────────────────── */
+    .hero-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #3b82f6;
+        margin-bottom: 0.6rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Big headline — the type IS the design ─────────────────────── */
+    .hero-headline {
+        font-size: clamp(3rem, 6vw, 4rem);
+        font-weight: 900;
+        color: #f9fafb;
+        letter-spacing: -0.04em;
+        line-height: 1.0;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    .hero-headline-accent {
+        color: #2563eb;
+    }
+
+    /* ── One-line description ──────────────────────────────────────── */
+    .hero-desc {
+        font-size: 0.96rem;
         color: #94a3b8;
-        letter-spacing: 0.5px;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ── Inline risk-scale gauge (no box, lives on bare canvas) ────── */
+    .gauge-wrap {
+        margin: 0 auto 1.5rem auto;
+        position: relative;
+        z-index: 1;
+    }
+    .gauge-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.45rem;
+    }
+    .gauge-label-left  { font-size: 0.7rem; color: #059669; font-weight: 600; }
+    .gauge-label-center {
+        font-size: 0.72rem;
+        color: #60a5fa;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+    .gauge-label-right { font-size: 0.7rem; color: #ef4444; font-weight: 600; }
+    .gauge-track {
+        height: 6px;
+        border-radius: 3px;
+        background: #1e293b;
+        display: flex;
+        overflow: visible;
+        position: relative;
+    }
+    .gauge-seg-low {
+        width: 29%;
+        height: 100%;
+        background: linear-gradient(90deg, #064e3b, #059669);
+        border-radius: 3px 0 0 3px;
+    }
+    .gauge-seg-high {
+        flex: 1;
+        height: 100%;
+        background: linear-gradient(90deg, #7f1d1d, #450a0a);
+        border-radius: 0 3px 3px 0;
+    }
+    .gauge-pin {
+        position: absolute;
+        left: 29%;
+        top: -5px;
+        width: 2px;
+        height: 16px;
+        background: #60a5fa;
+        border-radius: 1px;
+        box-shadow: 0 0 8px rgba(96,165,250,0.8);
+        transform: translateX(-50%);
+    }
+    .gauge-caption {
+        font-size: 0.7rem;
+        color: #475569;
+        margin-top: 0.5rem;
+        text-align: center;
+        letter-spacing: 0.01em;
+    }
+
+    /* ── Typography Scale (workspace) ─────────────────────────────── */
+    .title-primary {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #f9fafb;
+        letter-spacing: -0.02em;
         margin-bottom: 0.2rem;
     }
-    .workspace-banner {
-        background: #0f172a;
-        border: 1px solid #1e293b;
-        border-left: 4px solid #3b82f6;
-        padding: 0.75rem 1.25rem;
-        border-radius: 8px;
-        color: #cbd5e1;
-        font-size: 0.92rem;
+    .subtitle-muted {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: #9ca3af;
+        margin-bottom: 1.25rem;
+    }
+
+    /* ── Status Bar (workspace) ────────────────────────────────────── */
+    .status-bar {
+        background-color: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 6px;
+        padding: 0.55rem 1rem;
+        font-size: 0.82rem;
+        color: #d1d5db;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1.25rem;
     }
-    .hero-banner {
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-        border: 1px solid #334155;
-        border-left: 5px solid #3b82f6;
-        padding: 1.1rem 1.4rem;
-        border-radius: 10px;
-        color: #f8fafc;
-        font-size: 1.02rem;
+
+    /* ── Sidebar ───────────────────────────────────────────────────── */
+    div[data-testid="stSidebar"] {
+        background-color: #0b0f19 !important;
+        border-right: 1px solid #1f2937 !important;
+    }
+    .nav-group-header {
+        font-size: 0.75rem;
         font-weight: 500;
-        margin-bottom: 1.2rem;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+        color: #6b7280;
+        margin-top: 1.1rem;
+        margin-bottom: 0.25rem;
+        padding-left: 0.4rem;
+        text-transform: capitalize;
     }
-    .disclaimer-box {
-        background-color: #0f172a;
-        border-left: 4px solid #f59e0b;
-        padding: 0.85rem 1.1rem;
-        border-radius: 8px;
-        font-size: 0.88rem;
-        color: #cbd5e1;
+    .nav-group-space { margin-bottom: 0.4rem; }
+    div[data-testid="stSidebar"] button[kind="secondary"] {
+        background-color: transparent !important;
+        border: none !important;
+        color: #9ca3af !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        font-size: 0.84rem !important;
+        padding: 0.35rem 0.6rem !important;
+        margin-bottom: 0.1rem !important;
+        font-weight: 400 !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+    }
+    div[data-testid="stSidebar"] button[kind="secondary"]:hover {
+        background-color: #1f2937 !important;
+        color: #f9fafb !important;
+    }
+    div[data-testid="stSidebar"] button[kind="primary"] {
+        background-color: #1e3a8a !important;
+        border: none !important;
+        border-left: 3px solid #2563eb !important;
+        color: #f9fafb !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        padding: 0.35rem 0.6rem !important;
+        margin-bottom: 0.1rem !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+    }
+
+    /* ── Primary Accent Button ─────────────────────────────────────── */
+    div[data-testid="stAppViewContainer"] button[kind="primary"] {
+        background-color: #2563eb !important;
+        border: 1px solid #2563eb !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.01em !important;
+    }
+    div[data-testid="stAppViewContainer"] button[kind="primary"]:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+    }
+
+    /* ── Panels & Callouts ─────────────────────────────────────────── */
+    .panel-box {
+        background-color: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 6px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+    }
+    .info-callout {
+        background-color: #111827;
+        border-left: 3px solid #2563eb;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: #d1d5db;
         margin: 1rem 0;
         line-height: 1.5;
     }
-    .badge-supported {
-        background-color: #166534;
-        color: #dcfce7;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .badge-partial {
-        background-color: #854d0e;
-        color: #fef08a;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .badge-incompatible {
-        background-color: #991b1b;
-        color: #fee2e2;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .nav-header {
-        font-size: 0.78rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #64748b;
-        letter-spacing: 1px;
-        margin-top: 1.1rem;
-        margin-bottom: 0.3rem;
-    }
-    .active-config-card {
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.2rem;
-    }
+
+    /* ── Status Badges ─────────────────────────────────────────────── */
+    .badge-supported   { background:#064e3b; color:#a7f3d0; padding:2px 8px; border-radius:4px; font-size:0.78rem; font-weight:600; }
+    .badge-partial     { background:#713f12; color:#fef08a; padding:2px 8px; border-radius:4px; font-size:0.78rem; font-weight:600; }
+    .badge-incompatible{ background:#7f1d1d; color:#fecaca; padding:2px 8px; border-radius:4px; font-size:0.78rem; font-weight:600; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -144,13 +343,19 @@ st.markdown(
 
 
 # ==============================================================================
-# 2. Session State & Baseline Initialization
+# 2. Session State Initialization
 # ==============================================================================
+if "landing_passed" not in st.session_state:
+    st.session_state.landing_passed = False
+
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Dashboard Overview"
+
 if "active_workspace" not in st.session_state:
-    st.session_state.active_workspace = "Acme Storage (Production Workspace)"
+    st.session_state.active_workspace = "Session Workspace | Local Browser Scope"
 
 if "dataset_name" not in st.session_state:
-    st.session_state.dataset_name = "Synthetic Challenge Dataset (4,939 Executions)"
+    st.session_state.dataset_name = "synthetic_execution_logs_10000.csv (4,939 Runs)"
 
 if "custom_df" not in st.session_state:
     st.session_state.custom_df = None
@@ -177,7 +382,64 @@ if "active_config" not in st.session_state:
 
 
 # ==============================================================================
-# 3. Artifact Loading & Safe Caching
+# 3. Landing / Launch Screen View (Refined Hero & Gauge Composition)
+# ==============================================================================
+if not st.session_state.landing_passed:
+    # ── Balanced top bar: wordmark left, deploy pill + kebab right ──
+    st.markdown(
+        """
+        <div class='landing-topbar'>
+            <div class='landing-wordmark'>
+                <span class='landing-wordmark-dot'></span>
+                ConfigPilot
+            </div>
+            <div class='landing-topbar-right'>
+                <span class='landing-deploy-pill'>Prototype Build</span>
+                <span class='landing-kebab'>⋯</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ── Centered layout: one narrow column for hero composition ─────
+    _, col_hero, _ = st.columns([1, 2, 1])
+    with col_hero:
+        hero_html = (
+            "<div class='landing-stage'>"
+            "<div class='hero-eyebrow'>AI Configuration &amp; Reliability Copilot</div>"
+            "<div class='hero-headline'>Config<span class='hero-headline-accent'>Pilot</span></div>"
+            "<div class='hero-desc'>Evaluates 13 controllable system configuration parameters "
+            "to estimate failure risk before workload execution.</div>"
+            "<div class='gauge-wrap'>"
+            "<div class='gauge-header'>"
+            "<span class='gauge-label-left'>&#9679; LOW RISK</span>"
+            "<span class='gauge-label-center'>&#11045; 29.00% THRESHOLD</span>"
+            "<span class='gauge-label-right'>&#9679; HIGH RISK</span>"
+            "</div>"
+            "<div class='gauge-track'>"
+            "<div class='gauge-seg-low'></div>"
+            "<div class='gauge-seg-high'></div>"
+            "<div class='gauge-pin'></div>"
+            "</div>"
+            "<div class='gauge-caption'>"
+            "Decision boundary &middot; 29.00% failure probability (Validation-set F&#8321; optimised)"
+            "</div>"
+            "</div>"
+            "</div>"
+        )
+        st.markdown(hero_html, unsafe_allow_html=True)
+
+        st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+        if st.button("Launch ConfigPilot", use_container_width=True, type="primary", key="landing_cta"):
+            st.session_state.landing_passed = True
+            st.rerun()
+
+    st.stop()
+
+
+# ==============================================================================
+# 4. Artifact Loading & Caching
 # ==============================================================================
 @st.cache_resource
 def load_configpilot_artifacts():
@@ -187,7 +449,7 @@ def load_configpilot_artifacts():
     data_path = os.path.join(project_root, "data", "synthetic_execution_logs_10000.csv")
 
     if not os.path.exists(model_path) or not os.path.exists(threshold_path):
-        st.error("Model artifacts not found! Please ensure models directory exists.")
+        st.error("Model artifacts not found! Please check model directory.")
         st.stop()
 
     if not os.path.exists(data_path):
@@ -202,14 +464,14 @@ def load_configpilot_artifacts():
     return model, threshold, df_raw, X_matrix
 
 
-# Load persistent artifacts
+# Load artifacts
 try:
     model, best_threshold, df_default, X_default = load_configpilot_artifacts()
 except Exception as e:
     st.error(f"Error loading ConfigPilot artifacts: {e}")
     st.stop()
 
-# Determine currently active dataset
+# Active Dataset Selection
 if st.session_state.custom_df is not None:
     df_historical = st.session_state.custom_df
     try:
@@ -221,7 +483,6 @@ else:
     X_historical = X_default
 
 
-# Helper: construct input row DataFrame from active_config
 def get_active_config_row(baseline_df: pd.DataFrame, config_dict: dict) -> pd.DataFrame:
     row = baseline_df.iloc[[0]].copy()
     for k, v in config_dict.items():
@@ -231,12 +492,8 @@ def get_active_config_row(baseline_df: pd.DataFrame, config_dict: dict) -> pd.Da
 
 
 # ==============================================================================
-# 4. Header & Sidebar Navigation Structure (5 Categories)
+# 5. Header & Structural Nested Sidebar Navigation
 # ==============================================================================
-st.markdown("<div class='main-title'>ConfigPilot</div>", unsafe_allow_html=True)
-st.markdown("<div class='tagline'>AI Configuration & Reliability Copilot &nbsp;|&nbsp; Predict. Explain. Simulate. Recommend.</div>", unsafe_allow_html=True)
-
-# Workspace Banner Bar
 current_compat = (
     st.session_state.validation_report["compatibility_status"]
     if st.session_state.validation_report
@@ -247,12 +504,23 @@ badge_class = (
     else ("badge-partial" if current_compat == "PARTIALLY COMPATIBLE" else "badge-incompatible")
 )
 
+# Workspace Header Row
+hdr_col1, hdr_col2 = st.columns([3, 1])
+with hdr_col1:
+    st.markdown("<div class='title-primary'>ConfigPilot</div>", unsafe_allow_html=True)
+    st.markdown("<div class='subtitle-muted'>Configuration Reliability & Risk Analysis</div>", unsafe_allow_html=True)
+with hdr_col2:
+    if st.button("← Return to Intro", type="secondary"):
+        st.session_state.landing_passed = False
+        st.rerun()
+
+# Status Bar
 st.markdown(
     f"""
-    <div class='workspace-banner'>
+    <div class='status-bar'>
         <div>
-            🏢 <b>Workspace</b>: <code>{st.session_state.active_workspace}</code> &nbsp;|&nbsp;
-            📊 <b>Execution Data</b>: <code>{st.session_state.dataset_name}</code>
+            <code>{st.session_state.active_workspace}</code> &nbsp;·&nbsp;
+            Dataset: <code>{st.session_state.dataset_name}</code>
         </div>
         <div>
             <span class='{badge_class}'>● {current_compat}</span>
@@ -262,94 +530,122 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Sidebar Grouped SaaS Navigation
-st.sidebar.title("ConfigPilot Command")
-st.sidebar.caption("SandDisk Challenge AI Copilot Engine")
+# Helper: Render nested sidebar navigation row
+def render_nav_row(page_label: str):
+    is_active = (st.session_state.current_page == page_label)
+    btn_kind = "primary" if is_active else "secondary"
+    if st.sidebar.button(page_label, key=f"nav_btn_{page_label}", use_container_width=True, type=btn_kind):
+        st.session_state.current_page = page_label
+        st.rerun()
 
-st.sidebar.markdown("<div class='nav-header'>Command Center</div>", unsafe_allow_html=True)
-nav_cc = ["🏠 Dashboard Overview", "📥 Data Ingestion & Validation"]
+# Structural Nested Sidebar Navigation
+st.sidebar.caption("SandDisk Challenge Copilot Prototype")
 
-st.sidebar.markdown("<div class='nav-header'>Copilot Capabilities</div>", unsafe_allow_html=True)
-nav_copilot = ["💬 Ask ConfigPilot", "🚀 Failure Risk Prediction", "🏆 Configuration Recommendations"]
+# Group 1: Dashboard
+st.sidebar.markdown("<div class='nav-group-header'>Dashboard</div>", unsafe_allow_html=True)
+render_nav_row("Dashboard Overview")
+render_nav_row("Data Ingestion & Validation")
 
-st.sidebar.markdown("<div class='nav-header'>Scenarios & Trade-offs</div>", unsafe_allow_html=True)
-nav_scenarios = ["🧪 What-If Analysis", "📈 Performance & Trade-offs"]
+st.sidebar.markdown("<div class='nav-group-space'></div>", unsafe_allow_html=True)
 
-st.sidebar.markdown("<div class='nav-header'>Reliability Intelligence</div>", unsafe_allow_html=True)
-nav_reliability = ["🔍 Failure Detective", "🔀 What Changed?", "📊 Configuration Intelligence", "🎲 Randomization & Determinism"]
+# Group 2: Copilot
+st.sidebar.markdown("<div class='nav-group-header'>Copilot</div>", unsafe_allow_html=True)
+render_nav_row("Ask ConfigPilot")
+render_nav_row("Failure Risk Prediction")
+render_nav_row("Configuration Recommendations")
 
-st.sidebar.markdown("<div class='nav-header'>Governance & Audit</div>", unsafe_allow_html=True)
-nav_gov = ["📋 Methodology & Audit"]
+st.sidebar.markdown("<div class='nav-group-space'></div>", unsafe_allow_html=True)
 
-all_nav_options = nav_cc + nav_copilot + nav_scenarios + nav_reliability + nav_gov
-navigation_mode = st.sidebar.radio("Navigate:", all_nav_options, label_visibility="collapsed")
+# Group 3: Scenarios
+st.sidebar.markdown("<div class='nav-group-header'>Scenarios</div>", unsafe_allow_html=True)
+render_nav_row("What-If Analysis")
+render_nav_row("Performance & Trade-offs")
 
-st.sidebar.markdown("---")
-st.sidebar.markdown(f"**Baseline Model**: Random Forest (300 Trees)")
-st.sidebar.markdown(f"**Decision Boundary**: `{best_threshold * 100:.2f}%` (Val F1 Max)")
-st.sidebar.markdown(f"**Loaded Executions**: `{len(df_historical):,}` runs")
-st.sidebar.caption("ConfigPilot Prototype | Built for SandDisk Challenge")
+st.sidebar.markdown("<div class='nav-group-space'></div>", unsafe_allow_html=True)
+
+# Group 4: Reliability
+st.sidebar.markdown("<div class='nav-group-header'>Reliability</div>", unsafe_allow_html=True)
+render_nav_row("Failure Detective")
+render_nav_row("What Changed?")
+render_nav_row("Configuration Intelligence")
+render_nav_row("Randomization & Determinism")
+
+st.sidebar.markdown("<div class='nav-group-space'></div>", unsafe_allow_html=True)
+
+# Group 5: Governance
+st.sidebar.markdown("<div class='nav-group-header'>Governance</div>", unsafe_allow_html=True)
+render_nav_row("Methodology & Audit")
+
+st.sidebar.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
+st.sidebar.caption("Random Forest (300 Trees) | Threshold: 29.00%")
+
+navigation_mode = st.session_state.current_page
 
 
 # ==============================================================================
-# MODE: 🏠 DASHBOARD OVERVIEW & COMMAND CENTER
+# MODE: DASHBOARD OVERVIEW
 # ==============================================================================
-if navigation_mode == "🏠 Dashboard Overview":
-    st.header("🏠 Engineering Command Center")
-    st.markdown("Operational overview of system reliability metrics, active workspace configuration status, and dataset health.")
+if navigation_mode == "Dashboard Overview":
+    st.subheader("Dashboard Overview")
+    st.markdown("System reliability metrics and active session configuration.")
 
-    # Calculate active configuration risk
     active_row = get_active_config_row(X_historical, st.session_state.active_config)
     active_pred = predict_failure_risk(model, best_threshold, active_row)
-    active_risk_pct = active_pred["failure_probability"] * 100.0
 
-    d1, d2, d3, d4 = st.columns(4)
-    d1.metric("Active Dataset Size", f"{len(df_historical):,} executions", f"Status: {current_compat}")
-    d2.metric("PASS / FAIL Ratio", f"{(df_historical['pass_fail']=='PASS').sum() if 'pass_fail' in df_historical.columns else 'N/A'} / {(df_historical['pass_fail']=='FAIL').sum() if 'pass_fail' in df_historical.columns else 'N/A'}", "Historical Log Distribution")
-    d3.metric("Active Config Risk", f"{active_risk_pct:.2f}%", f"Level: {active_pred['risk_level']}")
-    d4.metric("Model Threshold", f"{best_threshold * 100:.2f}%", "Val Set F1 Optimization")
+    st.markdown("##### Validated Model Benchmarks")
+    st.caption("Validated on current synthetic challenge dataset (Untouched Test Set, N=988). Headline metrics remain stable across uploaded datasets.")
 
-    st.markdown("### ⚡ Active Workspace Configuration Context")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Overall Accuracy", "83.3%", "Validated Benchmark")
+    m2.metric("Macro F1 Score", "0.706", "Val F1 Max Threshold")
+    m3.metric("FAIL Recall", "66.92%", "87 of 130 Failures Detected")
+    m4.metric("FAIL Precision", "41.63%", "TP=87, FP=122")
+
+    st.markdown(
+        """
+        <div class='info-callout'>
+            Precision Caveat: With 41.63% FAIL precision, roughly 3 in 5 flagged failures are false alarms (122 false positives out of 209 flagged runs).
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("##### Active Session Configuration")
     st.markdown(
         f"""
-        <div class='active-config-card'>
-            <b>Active Configuration Vector</b>: Queue Depth = <code>{st.session_state.active_config['queue_depth']}</code> |
+        <div class='panel-box'>
+            <b>Active Parameters</b>: Queue Depth = <code>{st.session_state.active_config['queue_depth']}</code> |
             Thread Count = <code>{st.session_state.active_config['thread_count']}</code> |
             Cache = <code>{st.session_state.active_config['cache_size_mb']} MB</code> |
             Memory = <code>{st.session_state.active_config['memory_allocation_mb']} MB</code> |
             Workload = <code>{st.session_state.active_config['workload_type']}</code><br/>
-            <span style='font-size:0.88rem; color:#94a3b8;'>This active configuration is shared persistently across Failure Risk Prediction, What-If Analysis, and Recommendations.</span>
+            <span style='font-size:0.84rem; color:#9ca3af;'>Active configuration is stored in <code>st.session_state</code> for your current browser session.</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("### 🌟 Copilot Decision Engine Capabilities")
     c_a, c_b, c_c = st.columns(3)
-
     with c_a:
-        st.markdown("#### ⚡ Configuration Copilot")
-        st.write("• **Failure Risk Prediction**: Pre-failure evaluation of 13 controllable parameters.")
-        st.write("• **Configuration Recommendations**: Lower-predicted-risk candidates under risk budgets.")
-        st.write("• **Performance & Trade-offs**: Pareto curve of throughput vs predicted risk.")
-
+        st.markdown("##### Copilot")
+        st.write("• **Failure Risk Prediction**: Pre-failure risk score across 13 parameters.")
+        st.write("• **Configuration Recommendations**: Top historical candidates under risk constraints.")
+        st.write("• **Performance & Trade-offs**: Pareto curve of throughput vs risk.")
     with c_b:
-        st.markdown("#### 🧪 Scenarios & Detective")
-        st.write("• **What-If Analysis**: Interactive baseline vs scenario risk deltas.")
-        st.write("• **Failure Detective**: Telemetry percentile ranks and local sensitivity.")
+        st.markdown("##### Scenarios")
+        st.write("• **What-If Analysis**: Baseline vs scenario risk shift estimator.")
+        st.write("• **Failure Detective**: Telemetry percentile ranks & sensitivity.")
         st.write("• **What Changed?**: Side-by-side run diff semantics.")
-
     with c_c:
-        st.markdown("#### 🛡️ Reliability & Governance")
-        st.write("• **Data Ingestion**: External CSV validation and compatibility inspector.")
-        st.write("• **Configuration Intelligence**: Feature importances & model reliance.")
-        st.write("• **Ask ConfigPilot**: Natural language intent query engine.")
+        st.markdown("##### Reliability & Governance")
+        st.write("• **Data Ingestion**: Schema verification with explicit compatibility tiers.")
+        st.write("• **Feature Leakage Audit**: Structural audit confirming 60 pre-failure features.")
+        st.write("• **Ask ConfigPilot**: Deterministic query engine.")
 
     st.markdown(
         """
-        <div class='disclaimer-box'>
-            📝 <b>Challenge Context & Synthetic Data Disclaimer</b>:<br/>
-            <i>Following challenge guidance, this prototype uses synthetically generated execution-log data because actual execution data cannot be distributed under NDA. Production deployment would validate this exact pipeline on live hardware logs.</i>
+        <div class='info-callout'>
+            Challenge Data Context: Per hackathon organizer guidance, this prototype uses synthetically generated execution-log data (synthetic_execution_logs_10000.csv: 4,939 records, 114 columns, 4,289 PASS / 650 FAIL) because actual execution datasets cannot be distributed under NDA.
         </div>
         """,
         unsafe_allow_html=True,
@@ -357,17 +653,17 @@ if navigation_mode == "🏠 Dashboard Overview":
 
 
 # ==============================================================================
-# MODE: 📥 DATA INGESTION & SCHEMA VALIDATION
+# MODE: DATA INGESTION & VALIDATION
 # ==============================================================================
-elif navigation_mode == "📥 Data Ingestion & Validation":
-    st.header("📥 Data Ingestion & Schema Validation")
-    st.markdown("Upload external execution logs to validate schema compatibility against the ConfigPilot ML model.")
+elif navigation_mode == "Data Ingestion & Validation":
+    st.subheader("Data Ingestion & Validation")
+    st.markdown("Upload execution log CSV files to validate schema compatibility against model requirements.")
 
     i1, i2 = st.columns([1, 1])
 
     with i1:
-        st.subheader("1. Execution Log Data Source")
-        st.markdown("**Current Dataset**: " + st.session_state.dataset_name)
+        st.markdown("##### 1. Data Source")
+        st.write(f"Active Dataset: `{st.session_state.dataset_name}`")
 
         uploaded_file = st.file_uploader("Upload Execution Log CSV", type=["csv"])
 
@@ -376,43 +672,50 @@ elif navigation_mode == "📥 Data Ingestion & Validation":
             st.session_state.custom_df = new_df
             st.session_state.validation_report = report
             st.session_state.dataset_name = f"Uploaded CSV ({uploaded_file.name})"
-            st.success(f"Successfully ingested {report['total_rows']:,} records from `{uploaded_file.name}`.")
+            st.success(f"Ingested {report['total_rows']:,} records from `{uploaded_file.name}`.")
         else:
             if st.button("Reset to Default Synthetic Dataset"):
                 st.session_state.custom_df = None
                 st.session_state.validation_report = validate_dataset_schema(df_default)
-                st.session_state.dataset_name = "Synthetic Challenge Dataset (4,939 Executions)"
-                st.info("Reset to default challenge dataset.")
+                st.session_state.dataset_name = "synthetic_execution_logs_10000.csv (4,939 Runs)"
+                st.info("Reset to default synthetic challenge dataset.")
 
     with i2:
-        st.subheader("2. Schema & Quality Validation Report")
+        st.markdown("##### 2. Validation Report")
         v_report = (
             st.session_state.validation_report
             if st.session_state.validation_report
             else validate_dataset_schema(df_historical)
         )
 
-        st.markdown(f"### Compatibility Status: `{v_report['compatibility_status']}`")
+        st.markdown(f"**Compatibility**: `{v_report['compatibility_status']}`")
         st.write(v_report["compatibility_message"])
 
-        st.markdown("#### Diagnostic Checks Summary")
+        st.markdown(
+            """
+            <div class='info-callout'>
+                Compatibility Rules:<br/>
+                • SUPPORTED: 0 required model features missing AND target column present.<br/>
+                • PARTIALLY COMPATIBLE: All 13 model-required parameters present, but non-model/optional analytics fields missing.<br/>
+                • INCOMPATIBLE: ≥1 required model feature missing (predictions disabled).
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
         checks_df = pd.DataFrame(v_report["check_details"])
-        st.dataframe(checks_df, use_container_width=True, hide_index=True)
-
-        if v_report["missing_config_features"]:
-            st.warning(f"⚠️ Missing Controllable Parameters: `{', '.join(v_report['missing_config_features'])}`")
+        st.dataframe(checks_df, width='stretch', hide_index=True)
 
 
 # ==============================================================================
-# MODE: 💬 ASK CONFIGPILOT
+# MODE: ASK CONFIGPILOT
 # ==============================================================================
-elif navigation_mode == "💬 Ask ConfigPilot":
-    st.header("💬 Ask ConfigPilot — AI Reliability Assistant")
-    st.markdown("Query ConfigPilot's decision engine using natural language questions to retrieve live computed answers.")
+elif navigation_mode == "Ask ConfigPilot":
+    st.subheader("Ask ConfigPilot")
+    st.markdown("Query ConfigPilot's decision engine using natural language questions.")
 
-    st.markdown("**Suggested Engineering & Judge Queries:**")
+    st.markdown("##### Suggested Queries")
     q_cols1 = st.columns(3)
-
     suggested_q = None
     if q_cols1[0].button("What settings influence failure most?"):
         suggested_q = "What configuration settings influence failure the most?"
@@ -429,27 +732,23 @@ elif navigation_mode == "💬 Ask ConfigPilot":
     if q_cols2[2].button("Recommend a config below 5% risk"):
         suggested_q = "Recommend a configuration below 5% predicted failure risk."
 
-    user_query = st.text_input("Type your question for ConfigPilot Assistant:", value=suggested_q if suggested_q else "")
+    user_query = st.text_input("Question:", value=suggested_q if suggested_q else "")
 
     if user_query:
         st.markdown("---")
         res = process_sanddisk_query(user_query, model, best_threshold, df_historical, X_historical)
-
-        st.markdown(f"### 🎯 Intent: `{res['intent']}`")
+        st.markdown(f"**Intent**: `{res['intent']}`")
         st.markdown(res["answer"])
-
         if res["data_type"] == "dataframe" and res["data"] is not None:
-            st.dataframe(res["data"], use_container_width=True, hide_index=True)
+            st.dataframe(res["data"], width='stretch', hide_index=True)
 
 
 # ==============================================================================
-# MODE: 🚀 FAILURE RISK PREDICTION
+# MODE: FAILURE RISK PREDICTION
 # ==============================================================================
-elif navigation_mode == "🚀 Failure Risk Prediction":
-    st.header("🚀 Failure Risk Prediction")
-    st.markdown("Specify or adjust the active system configuration across 13 controllable parameters to predict failure risk before running.")
-
-    st.subheader("1. Controllable Parameter Inputs (Syncs to Active Workspace State)")
+elif navigation_mode == "Failure Risk Prediction":
+    st.subheader("Failure Risk Prediction")
+    st.markdown("Specify inputs across 13 controllable parameters to predict failure risk before running.")
 
     cfg = st.session_state.active_config
     col1, col2, col3 = st.columns(3)
@@ -494,41 +793,36 @@ elif navigation_mode == "🚀 Failure Risk Prediction":
         cfg["read_write_ratio"] = st.slider("13. read_write_ratio", 0.0, 100.0, float(cfg["read_write_ratio"]))
 
     st.session_state.active_config = cfg
-
     st.markdown("---")
 
-    # Evaluate Active Configuration
     active_row = get_active_config_row(X_historical, cfg)
     pred_res = predict_failure_risk(model, best_threshold, active_row)
     fail_prob_pct = pred_res["failure_probability"] * 100.0
 
-    st.subheader("2. ConfigPilot Risk Evaluation")
-
+    st.markdown("##### Risk Evaluation")
     r1, r2, r3, r4 = st.columns(4)
-    r1.metric("Predicted Failure Risk", f"{fail_prob_pct:.2f}%", f"Threshold = {best_threshold*100:.2f}%")
-    r2.metric("Model Prediction", pred_res["prediction"])
+    r1.metric("Predicted Risk", f"{fail_prob_pct:.2f}%", f"Threshold = {best_threshold*100:.2f}%")
+    r2.metric("Prediction", pred_res["prediction"])
     r3.metric("Risk Level", pred_res["risk_level"])
+    risk_label_text = "LOW RISK" if pred_res["prediction"] == "PASS" else "HIGH RISK"
+    r4.metric("Assessment", risk_label_text)
 
-    risk_label_text = "LOW PREDICTED RISK" if pred_res["prediction"] == "PASS" else "HIGH PREDICTED RISK"
-    r4.metric("Model Assessment", risk_label_text)
-
-    # Local Sensitivity Analysis
-    st.markdown("### 🔍 Sensitivity & Contributing Factors")
+    st.markdown("##### Feature Sensitivity")
     sens_df = calculate_local_sensitivity(model, active_row, df_historical)
     if not sens_df.empty:
-        st.dataframe(sens_df.head(6), use_container_width=True, hide_index=True)
+        st.dataframe(sens_df.head(6), width='stretch', hide_index=True)
 
 
 # ==============================================================================
-# MODE: 🏆 CONFIGURATION RECOMMENDATIONS
+# MODE: CONFIGURATION RECOMMENDATIONS
 # ==============================================================================
-elif navigation_mode == "🏆 Configuration Recommendations":
-    st.header("🏆 Configuration Recommendations")
-    st.markdown("Set a maximum risk constraint. ConfigPilot evaluates candidate historical configurations and presents Pareto candidates ranked by observed throughput.")
+elif navigation_mode == "Configuration Recommendations":
+    st.subheader("Configuration Recommendations")
+    st.markdown("Set a maximum risk constraint to find top candidate historical configurations ranked by observed throughput.")
 
     col_r1, col_r2 = st.columns([2, 1])
     with col_r1:
-        risk_budget = st.slider("Maximum Acceptable Predicted Failure Risk Constraint (%)", 0.5, 20.0, 5.0, 0.5)
+        risk_budget = st.slider("Maximum Acceptable Failure Risk Constraint (%)", 0.5, 20.0, 5.0, 0.5)
     with col_r2:
         selected_wl = st.selectbox("Filter Workload Type:", ["All Workloads"] + list(df_historical["workload_type"].unique() if "workload_type" in df_historical.columns else []))
         wl_filter = None if selected_wl == "All Workloads" else selected_wl
@@ -543,9 +837,9 @@ elif navigation_mode == "🏆 Configuration Recommendations":
 
     if top_candidate is not None:
         st.markdown(
-            """
-            <div class='hero-banner'>
-                🌟 <b>Top historical candidate under the selected predicted-risk constraint</b>
+            f"""
+            <div class='panel-box'>
+                <b>Top Historical Candidate</b> (Risk ≤ {risk_budget}%, not a deployment guarantee)
             </div>
             """,
             unsafe_allow_html=True,
@@ -557,30 +851,28 @@ elif navigation_mode == "🏆 Configuration Recommendations":
         tc3.metric("Observed Throughput", f"{top_candidate.get('throughput_gbps', 0.0):.2f} Gbps")
         tc4.metric("Observed Latency", f"{top_candidate.get('average_latency_ms', 0.0):.2f} ms")
 
-        # Action: Apply as Active Configuration
-        if st.button("⚡ Apply Top Candidate as Active Workspace Configuration"):
+        if st.button("Apply Configuration", type="primary"):
             for feat in CONFIG_FEATURES:
                 if feat in top_candidate.index:
                     st.session_state.active_config[feat] = top_candidate[feat]
-            st.success("Active workspace configuration updated! You can now test it in Prediction or What-If.")
+            st.success("Active session configuration updated.")
 
-        # Recommendation Evidence Strength
         top_row_x = X_historical.loc[[top_candidate.name]]
         _, evidence = find_similar_configurations(top_row_x.iloc[0], df_historical, top_n=5)
-        st.info(f"📊 **Recommendation Evidence Strength**: Supported by `{evidence['total_similar_runs']}` similar historical runs with a `{evidence['historical_pass_rate_pct']}%` historical pass rate and `{evidence['average_throughput_gbps']} Gbps` average observed throughput.")
+        st.info(f"Evidence Strength: Supported by {evidence['total_similar_runs']} similar historical runs with a {evidence['historical_pass_rate_pct']}% historical pass rate and {evidence['average_throughput_gbps']} Gbps average throughput.")
 
-        st.markdown(f"#### Top 10 Recommended Configurations (Predicted Risk ≤ {risk_budget}%)")
+        st.markdown(f"##### Recommended Candidates (Predicted Risk ≤ {risk_budget}%)")
         disp_cols = [c for c in ["run_id", "workload_type", "queue_depth", "cache_size_mb", "thread_count", "throughput_gbps", "average_latency_ms", "predicted_risk_pct", "pass_fail"] if c in rec_df.columns]
-        st.dataframe(rec_df[disp_cols], use_container_width=True, hide_index=True)
+        st.dataframe(rec_df[disp_cols], width='stretch', hide_index=True)
     else:
         st.warning("No candidate configurations meet the specified risk constraint.")
 
 
 # ==============================================================================
-# MODE: 📈 PERFORMANCE & TRADE-OFFS
+# MODE: PERFORMANCE & TRADE-OFFS
 # ==============================================================================
-elif navigation_mode == "📈 Performance & Trade-offs":
-    st.header("📈 Performance & Trade-offs (Pareto Analysis)")
+elif navigation_mode == "Performance & Trade-offs":
+    st.subheader("Performance & Trade-offs")
     st.markdown("Analyze trade-offs between observed historical throughput, latency, and predicted failure risk.")
 
     risk_budget_p = st.slider("Risk Cutoff Threshold (%)", 1.0, 25.0, 10.0, 0.5)
@@ -593,16 +885,15 @@ elif navigation_mode == "📈 Performance & Trade-offs":
     )
 
     if not rec_df.empty:
-        st.subheader("Pareto-Efficient Historical Configurations")
+        st.markdown("##### Pareto Configurations")
         disp_cols = [c for c in ["run_id", "workload_type", "queue_depth", "cache_size_mb", "thread_count", "throughput_gbps", "average_latency_ms", "predicted_risk_pct", "pass_fail"] if c in rec_df.columns]
-        st.dataframe(rec_df[disp_cols], use_container_width=True, hide_index=True)
+        st.dataframe(rec_df[disp_cols], width='stretch', hide_index=True)
 
-        st.markdown("### 📈 Throughput vs Predicted Failure Risk Trade-off Chart")
-        fig, ax = plt.subplots(figsize=(8, 3.5))
-        ax.scatter(rec_df["predicted_risk_pct"], rec_df["throughput_gbps"], color="#3b82f6", s=70, alpha=0.8, edgecolors="black")
+        fig, ax = plt.subplots(figsize=(7, 3))
+        ax.scatter(rec_df["predicted_risk_pct"], rec_df["throughput_gbps"], color="#2563eb", s=60, alpha=0.8, edgecolors="black")
         ax.set_xlabel("Predicted Failure Risk (%)")
         ax.set_ylabel("Observed Throughput (Gbps)")
-        ax.set_title("Pareto Trade-off: Observed Throughput vs Predicted Failure Risk")
+        ax.set_title("Observed Throughput vs Predicted Risk")
         ax.grid(True, alpha=0.3)
         st.pyplot(fig)
     else:
@@ -610,42 +901,39 @@ elif navigation_mode == "📈 Performance & Trade-offs":
 
 
 # ==============================================================================
-# MODE: 🧪 WHAT-IF ANALYSIS
+# MODE: WHAT-IF ANALYSIS
 # ==============================================================================
-elif navigation_mode == "🧪 What-If Analysis":
-    st.header("🧪 What-If Analysis & Scenario Simulator")
-    st.markdown("Simulate parameter changes against your baseline active configuration to evaluate risk deltas.")
+elif navigation_mode == "What-If Analysis":
+    st.subheader("What-If Analysis")
+    st.markdown("Simulate parameter changes against your active session configuration to evaluate risk deltas.")
 
     st.markdown(
         """
-        <div class='disclaimer-box'>
-            💡 <b>Methodological Limit & Disclaimer</b>: What-If simulation estimates configuration risk under hypothetical inputs while holding baseline telemetry constant. It is a configuration-risk estimator, NOT a physical system physics simulator.
+        <div class='info-callout'>
+            Disclaimer: What-If simulation estimates configuration risk based on learned Random Forest model weights. It is a configuration-risk estimator, NOT a physical system simulator.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    tab_side_by_side, tab_single = st.tabs(["Side-by-Side Scenario Comparison", "Single Parameter Sweep"])
+    tab_side_by_side, tab_single = st.tabs(["Side-by-Side Comparison", "Single Parameter Sweep"])
 
     with tab_side_by_side:
-        st.subheader("Baseline vs Hypothetical Scenario Risk Shift")
-
         base_row = get_active_config_row(X_historical, st.session_state.active_config)
         base_res = predict_failure_risk(model, best_threshold, base_row)
         base_risk_pct = base_res["failure_probability"] * 100.0
 
         c_sc1, c_sc2 = st.columns(2)
-
         with c_sc1:
-            st.markdown("#### Baseline Active Configuration")
-            st.write(f"• **Queue Depth**: `{st.session_state.active_config['queue_depth']}`")
-            st.write(f"• **Thread Count**: `{st.session_state.active_config['thread_count']}`")
-            st.write(f"• **Cache Size**: `{st.session_state.active_config['cache_size_mb']} MB`")
-            st.write(f"• **Memory Allocation**: `{st.session_state.active_config['memory_allocation_mb']} MB`")
-            st.metric("Baseline Predicted Risk", f"{base_risk_pct:.2f}%", base_res["prediction"])
+            st.markdown("##### Baseline Active Configuration")
+            st.write(f"• Queue Depth: `{st.session_state.active_config['queue_depth']}`")
+            st.write(f"• Thread Count: `{st.session_state.active_config['thread_count']}`")
+            st.write(f"• Cache Size: `{st.session_state.active_config['cache_size_mb']} MB`")
+            st.write(f"• Memory Allocation: `{st.session_state.active_config['memory_allocation_mb']} MB`")
+            st.metric("Baseline Risk", f"{base_risk_pct:.2f}%", base_res["prediction"])
 
         with c_sc2:
-            st.markdown("#### Modified Scenario Parameters")
+            st.markdown("##### Scenario Inputs")
             sim_qd = st.slider("Simulated Queue Depth:", 1, 256, int(st.session_state.active_config['queue_depth']))
             sim_threads = st.slider("Simulated Thread Count:", 1, 64, int(st.session_state.active_config['thread_count']))
 
@@ -654,14 +942,12 @@ elif navigation_mode == "🧪 What-If Analysis":
             new_risk_pct = multi_res["new_failure_probability"] * 100.0
             risk_delta = multi_res["percentage_point_change"]
 
-            st.metric("Scenario Predicted Risk", f"{new_risk_pct:.2f}%", delta=f"{risk_delta:+.2f} pp", delta_color="inverse")
+            st.metric("Scenario Risk", f"{new_risk_pct:.2f}%", delta=f"{risk_delta:+.2f} pp", delta_color="inverse")
 
-        st.markdown(f"### Verdict: Risk Shift = `{risk_delta:+.2f} percentage points` (`{base_res['prediction']} ➔ {multi_res['new_prediction']}`)")
+        st.markdown(f"**Verdict**: Risk Shift = `{risk_delta:+.2f} percentage points` (`{base_res['prediction']} ➔ {multi_res['new_prediction']}`)")
 
     with tab_single:
-        st.subheader("Single Parameter Sensitivity Sweep")
-        sweep_feature = st.selectbox("Select Parameter to Sweep:", ["queue_depth", "read_write_ratio", "thread_count", "memory_allocation_mb", "cache_size_mb"])
-
+        sweep_feature = st.selectbox("Parameter to Sweep:", ["queue_depth", "read_write_ratio", "thread_count", "memory_allocation_mb", "cache_size_mb"])
         base_row = get_active_config_row(X_historical, st.session_state.active_config)
 
         if sweep_feature == "queue_depth":
@@ -681,30 +967,29 @@ elif navigation_mode == "🧪 What-If Analysis":
         disp_sweep = sweep_df[["feature", "simulated_value", "failure_probability_pct", "risk_level"]].rename(
             columns={"failure_probability_pct": "Predicted Failure Risk (%)"}
         )
-        st.dataframe(disp_sweep, use_container_width=True, hide_index=True)
+        st.dataframe(disp_sweep, width='stretch', hide_index=True)
 
-        fig, ax = plt.subplots(figsize=(8, 3.2))
-        ax.plot(sweep_df["simulated_value"].astype(str), sweep_df["failure_probability_pct"], marker="o", color="#3b82f6", linewidth=2)
-        ax.axhline(best_threshold * 100, color="#ef4444", linestyle="--", label=f"Decision Boundary ({best_threshold*100:.1f}%)")
+        fig, ax = plt.subplots(figsize=(7, 2.8))
+        ax.plot(sweep_df["simulated_value"].astype(str), sweep_df["failure_probability_pct"], marker="o", color="#2563eb", linewidth=2)
+        ax.axhline(best_threshold * 100, color="#dc2626", linestyle="--", label=f"Decision Boundary ({best_threshold*100:.1f}%)")
         ax.set_xlabel(sweep_feature)
         ax.set_ylabel("Predicted Failure Risk (%)")
-        ax.set_title(f"What-If Risk Impact of {sweep_feature}")
+        ax.set_title(f"Risk Impact of {sweep_feature}")
         ax.legend()
         ax.grid(True, alpha=0.3)
         st.pyplot(fig)
 
 
 # ==============================================================================
-# MODE: 🔍 FAILURE DETECTIVE
+# MODE: FAILURE DETECTIVE
 # ==============================================================================
-elif navigation_mode == "🔍 Failure Detective":
-    st.header("🔍 Failure Detective")
+elif navigation_mode == "Failure Detective":
+    st.subheader("Failure Detective")
     st.markdown("Inspect historical execution runs with distinct separation between Model Predictions, Historical Outcomes, and Telemetry Ranks.")
 
     f_col1, f_col2 = st.columns([1, 3])
-
     with f_col1:
-        run_filter = st.radio("Filter Historical Runs:", ["All Runs", "FAIL Runs Only", "PASS Runs Only"])
+        run_filter = st.radio("Filter Runs:", ["All Runs", "FAIL Runs Only", "PASS Runs Only"])
         if run_filter == "FAIL Runs Only" and "pass_fail" in df_historical.columns:
             selectable_ids = df_historical[df_historical["pass_fail"] == "FAIL"]["run_id"].tolist()
         elif run_filter == "PASS Runs Only" and "pass_fail" in df_historical.columns:
@@ -714,52 +999,42 @@ elif navigation_mode == "🔍 Failure Detective":
         else:
             selectable_ids = list(range(len(df_historical)))
 
-        selected_run_id = st.selectbox("Select Run ID to Inspect:", selectable_ids)
+        selected_run_id = st.selectbox("Select Run ID:", selectable_ids)
 
     selected_row_df = df_historical[df_historical["run_id"] == selected_run_id] if "run_id" in df_historical.columns else df_historical.iloc[[selected_run_id]]
 
     if not selected_row_df.empty:
         row_data = selected_row_df.iloc[0]
         input_x = X_historical.loc[[row_data.name]]
-
         pred_res = predict_failure_risk(model, best_threshold, input_x)
 
         with f_col2:
-            st.markdown(f"### Run #{selected_run_id} Root-Cause Investigation")
+            st.markdown(f"##### Run #{selected_run_id} Analysis")
 
-            # Box 1: Model Prediction
-            st.markdown("#### 🤖 1. AI Model Prediction (Pre-Failure Features)")
+            st.markdown("1. Model Prediction (Pre-Failure Features)")
             p1, p2, p3 = st.columns(3)
             p1.metric("Predicted Failure Risk", f"{pred_res['failure_probability'] * 100:.2f}%")
             p2.metric("Model Prediction", pred_res["prediction"])
+            p3.metric("Model Status", pred_res["risk_level"])
 
-            p_badge = "LOW PREDICTED RISK" if pred_res["prediction"] == "PASS" else "HIGH PREDICTED RISK"
-            p3.metric("Model Status", p_badge)
-
-            st.markdown("---")
-
-            # Box 2: Ground Truth
-            st.markdown("#### 📋 2. Ground-Truth Historical Outcome")
+            st.markdown("2. Ground-Truth Historical Outcome")
             o1, o2, o3, o4 = st.columns(4)
-            o1.metric("Actual Ground Truth", str(row_data.get("pass_fail", "N/A")))
+            o1.metric("Ground Truth", str(row_data.get("pass_fail", "N/A")))
             o2.metric("Failure Type", str(row_data.get("failure_type", "NONE")))
             o3.metric("Observed Throughput", f"{row_data.get('throughput_gbps', 0.0):.2f} Gbps")
             o4.metric("Observed Latency", f"{row_data.get('average_latency_ms', 0.0):.2f} ms")
 
-            st.markdown("---")
-
-            # Box 3: Ranks & Percentiles
-            st.markdown("#### 📊 3. Telemetry Ranks & Percentile Observations")
+            st.markdown("3. Telemetry Ranks & Percentile Observations")
             pct_df = get_feature_percentiles(row_data, df_historical)
             if not pct_df.empty:
-                st.dataframe(pct_df, use_container_width=True, hide_index=True)
+                st.dataframe(pct_df, width='stretch', hide_index=True)
 
 
 # ==============================================================================
-# MODE: 🔀 WHAT CHANGED?
+# MODE: WHAT CHANGED?
 # ==============================================================================
-elif navigation_mode == "🔀 What Changed?":
-    st.header("🔀 What Changed Between Executions?")
+elif navigation_mode == "What Changed?":
+    st.subheader("What Changed?")
     st.markdown("Compare two execution runs side-by-side to understand parameter differences, telemetry shifts, and risk divergence.")
 
     run_list = df_historical["run_id"].tolist() if "run_id" in df_historical.columns else list(range(len(df_historical)))
@@ -779,29 +1054,25 @@ elif navigation_mode == "🔀 What Changed?":
     res_a = predict_failure_risk(model, best_threshold, x_a)
     res_b = predict_failure_risk(model, best_threshold, x_b)
 
-    st.markdown("### ⚡ Executive Comparison Summary")
+    st.markdown("##### Executive Summary")
     comp_col1, comp_col2, comp_col3 = st.columns(3)
-
     with comp_col1:
-        st.markdown(f"#### Run A (#{run_a_id})")
-        st.write(f"**Predicted Failure Risk**: `{res_a['failure_probability'] * 100:.2f}%`")
-        st.write(f"**Model Prediction**: `{res_a['prediction']}`")
-        st.write(f"**Actual Outcome**: `{row_a.get('pass_fail', 'N/A')}`")
+        st.write(f"**Run A (#{run_a_id})**")
+        st.write(f"Predicted Risk: `{res_a['failure_probability'] * 100:.2f}%`")
+        st.write(f"Actual Outcome: `{row_a.get('pass_fail', 'N/A')}`")
 
     with comp_col2:
-        st.markdown(f"#### Run B (#{run_b_id})")
-        st.write(f"**Predicted Failure Risk**: `{res_b['failure_probability'] * 100:.2f}%`")
-        st.write(f"**Model Prediction**: `{res_b['prediction']}`")
-        st.write(f"**Actual Outcome**: `{row_b.get('pass_fail', 'N/A')}`")
+        st.write(f"**Run B (#{run_b_id})**")
+        st.write(f"Predicted Risk: `{res_b['failure_probability'] * 100:.2f}%`")
+        st.write(f"Actual Outcome: `{row_b.get('pass_fail', 'N/A')}`")
 
     with comp_col3:
         risk_diff = (res_b['failure_probability'] - res_a['failure_probability']) * 100.0
         safer_config = "Run A" if risk_diff > 0 else ("Run B" if risk_diff < 0 else "Equal Risk")
-        st.markdown(f"#### ConfigPilot Comparison Verdict")
-        st.success(f"**Configuration with Lower Predicted Risk**: {safer_config}")
-        st.metric("Predicted Risk Delta", f"{abs(risk_diff):.2f} percentage points")
+        st.write(f"**Lower Predicted Risk**: {safer_config}")
+        st.metric("Risk Delta", f"{abs(risk_diff):.2f} pp")
 
-    st.markdown("### 📋 Parameter Differences")
+    st.markdown("##### Parameter Differences")
     diff_data = []
     all_cols = list(set(row_a.index).union(set(row_b.index)))
     for col in sorted(all_cols):
@@ -810,71 +1081,67 @@ elif navigation_mode == "🔀 What Changed?":
             val_b = row_b[col]
             if str(val_a) != str(val_b):
                 diff_data.append({
-                    "Parameter / Metric": col,
-                    "Run A Value": val_a,
-                    "Run B Value": val_b,
-                    "Category": "Controllable Config" if col in CONFIG_FEATURES else "System Telemetry / Log",
+                    "Parameter": col,
+                    "Run A": val_a,
+                    "Run B": val_b,
+                    "Category": "Controllable Config" if col in CONFIG_FEATURES else "Telemetry / Log",
                 })
 
     if diff_data:
-        st.dataframe(pd.DataFrame(diff_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(diff_data), width='stretch', hide_index=True)
 
 
 # ==============================================================================
-# MODE: 📊 CONFIGURATION INTELLIGENCE
+# MODE: CONFIGURATION INTELLIGENCE
 # ==============================================================================
-elif navigation_mode == "📊 Configuration Intelligence":
-    st.header("📊 Configuration Intelligence")
+elif navigation_mode == "Configuration Intelligence":
+    st.subheader("Configuration Intelligence")
     st.markdown("Inspect global Random Forest feature importances categorized by Controllable Config vs Telemetry parameters.")
 
     df_imp = get_global_feature_importances(model, list(X_historical.columns))
-
     st.markdown(
         """
-        <div class='disclaimer-box'>
-            ⚠️ <b>Labeling Note</b>: This table displays <b>Model Reliance / Predictive Importance</b>. Feature importances reflect model decision weights in the trained Random Forest, NOT physical causal influence.
+        <div class='info-callout'>
+            Labeling Note: This table displays Model Reliance / Predictive Importance. Feature importances reflect decision weights in the trained Random Forest, NOT physical causal influence.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.subheader("Top Predictive Features")
-    st.dataframe(df_imp.head(15), use_container_width=True, hide_index=True)
+    st.markdown("##### Top Predictive Features")
+    st.dataframe(df_imp.head(15), width='stretch', hide_index=True)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(7, 3))
     top_10 = df_imp.head(10)
-    ax.barh(top_10["feature"][::-1], top_10["importance"][::-1], color="#8b5cf6")
+    ax.barh(top_10["feature"][::-1], top_10["importance"][::-1], color="#2563eb")
     ax.set_xlabel("Model Predictive Importance")
-    ax.set_title("Top 10 Model Predictive Features")
+    ax.set_title("Top 10 Feature Importances")
     ax.grid(True, alpha=0.3)
     st.pyplot(fig)
 
 
 # ==============================================================================
-# MODE: 🎲 RANDOMIZATION & DETERMINISM
+# MODE: RANDOMIZATION & DETERMINISM
 # ==============================================================================
-elif navigation_mode == "🎲 Randomization & Determinism":
-    st.header("🎲 Randomization Impact & Failure Determinism")
-
-    st.subheader("1. Randomization Parameter Impact")
+elif navigation_mode == "Randomization & Determinism":
+    st.subheader("Randomization & Determinism")
     st.markdown("Inspect noise & randomization parameters ranked by model reliance.")
 
     df_imp = get_global_feature_importances(model, list(X_historical.columns))
     rand_features = ["timing_jitter_ms", "burst_probability", "fault_injection_probability", "voltage_variation_pct", "ambient_temperature_c", "request_arrival_rate"]
     rand_df = df_imp[df_imp["feature"].isin(rand_features)]
-    st.dataframe(rand_df, use_container_width=True, hide_index=True)
+    st.dataframe(rand_df, width='stretch', hide_index=True)
 
     st.markdown("---")
-
-    st.subheader("2. Failure Determinism Analysis")
+    st.markdown("##### Seed Group Failure Rate Analysis")
     if "seed_group" in df_historical.columns and "pass_fail" in df_historical.columns:
         seed_grp_fails = df_historical.groupby('seed_group')['pass_fail'].apply(lambda x: (x == 'FAIL').mean() * 100).round(2)
         st.write(pd.DataFrame({"seed_group": seed_grp_fails.index, "failure_rate_pct": seed_grp_fails.values}))
 
     st.markdown(
         """
-        <div class='disclaimer-box'>
-            ℹ️ <b>Honest PoC Disclaimer</b>: All 4,939 historical configurations represent unique parameter vectors (0 exact repeated trials). Insufficient repeated trials to establish deterministic behavior reliably for identical configurations.
+        <div class='info-callout'>
+            Honest PoC Disclaimer: All 4,939 historical configurations represent unique parameter vectors (0 exact repeated trials). Insufficient repeated trials to establish deterministic behavior reliably for identical configurations.
         </div>
         """,
         unsafe_allow_html=True,
@@ -882,29 +1149,39 @@ elif navigation_mode == "🎲 Randomization & Determinism":
 
 
 # ==============================================================================
-# MODE: 📋 METHODOLOGY & AUDIT
+# MODE: METHODOLOGY & AUDIT
 # ==============================================================================
-elif navigation_mode == "📋 Methodology & Audit":
-    st.header("📋 Methodology & Audit")
+elif navigation_mode == "Methodology & Audit":
+    st.subheader("Methodology & Audit")
+
+    leak_audit = run_feature_leakage_audit(df_default)
+
+    st.markdown(f"##### Automated Feature Leakage Audit")
+    st.code(leak_audit['audit_summary_text'])
+    st.write("Post-outcome symptom features and ground-truth identifiers are strictly excluded prior to feature matrix construction:")
+    st.write("• Excluded Identifiers (7): `run_id`, `timestamp`, `random_seed`, `seed_group`, `pass_fail`, `failure_type`, `execution_log`")
+    st.write("• Excluded Auxiliary Columns (40): `config_aux_01` to `config_aux_40`")
+    st.write("• Excluded Outcome Symptoms (7): `error_count`, `timeout_count`, `recovery_events`, `data_integrity_errors`, `watchdog_events`, `reliability_score`, `performance_score`")
+    st.write("*Note: Correlation does not prove zero leakage; automated structural verification confirms that excluded metadata and post-outcome symptoms are absent from predictive inputs.*")
+
+    st.markdown("##### Validated Model Benchmarks (Untouched Test Set, N=988)")
+    st.write("Validated on current synthetic challenge dataset (`synthetic_execution_logs_10000.csv`: 4,939 records, 114 columns, 4,289 PASS / 650 FAIL):")
+    st.write("• Overall Accuracy: `83.3%`")
+    st.write("• Macro F1 Score: `0.706`")
+    st.write("• FAIL Recall: `66.92%` (Detected 87 of 130 test failures)")
+    st.write("• FAIL Precision: `41.63%` (TP=87, FP=122; 87 of 209 flagged runs were actual failures)")
 
     st.markdown(
         """
-        ### 🛡️ Data Leakage Prevention
-        Post-outcome symptom features and ground-truth identifiers were strictly excluded prior to feature matrix construction:
-        - **Excluded Identifiers (7)**: `run_id`, `timestamp`, `random_seed`, `seed_group`, `pass_fail`, `failure_type`, `execution_log`
-        - **Excluded Auxiliary Columns (40)**: `config_aux_01` to `config_aux_40`
-        - **Excluded Outcome Symptoms (7)**: `error_count`, `timeout_count`, `recovery_events`, `data_integrity_errors`, `watchdog_events`, `reliability_score`, `performance_score`
-
-        ### ⚙️ Stratified Train / Validation / Test Audit
-        - **Total Dataset Size**: 4,939 validated synthetic logs (4,289 PASS, 650 FAIL)
-        - **Train / Val / Test Split**: 3,160 Train, 791 Validation, 988 Untouched Test
-        - **Validation Threshold Selection**: Optimal threshold (`0.2900` / `29.00%`) chosen strictly on **Validation Set F1 Max**.
-        - **Untouched Test Set Evaluation**:
-          - **Overall Accuracy**: `83.3%`
-          - **Macro F1**: `0.706`
-          - **FAIL Recall**: `66.92%` (Detected 87 of 130 test failures)
-
-        ### 📝 Hackathon Challenge Context
-        <i>Following challenge guidance, this prototype uses synthetically generated execution-log data because actual execution data cannot be distributed under NDA. Production deployment would require validation on real execution data.</i>
-        """
+        <div class='info-callout'>
+            Precision Caveat: With 41.63% FAIL precision, roughly 3 in 5 flagged failures are false alarms (122 false positives out of 209 flagged runs).
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
+
+    st.markdown("##### Session & Scope Disclosure")
+    st.write("Session state (`st.session_state`) is isolated strictly to your current local browser session. No multi-tenant backend server or persistent database is present in this prototype.")
+
+    st.markdown("##### Challenge Data Disclosure")
+    st.write("Per hackathon organizer guidance, this prototype uses synthetically generated execution-log data because actual multi-GB execution datasets cannot be distributed under NDA and infrastructure constraints.")

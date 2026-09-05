@@ -34,6 +34,8 @@ def audit_all():
 
     # 1. APP FUNCTIONALITY & MODULE IMPORTS
     try:
+        import streamlit as st_test
+        st_test.session_state.landing_passed = True
         import app
         results["1. APP FUNCTIONALITY"] = "PASS"
     except Exception as e:
@@ -111,15 +113,15 @@ def audit_all():
         rep_sup = validate_dataset_schema(df_raw)
         assert rep_sup["compatibility_status"] == "SUPPORTED", "Default CSV must be SUPPORTED"
 
-        # B. Missing required columns
-        df_missing = df_raw.drop(columns=["queue_depth", "cache_size_mb"])
-        rep_missing = validate_dataset_schema(df_missing)
-        assert rep_missing["compatibility_status"] == "PARTIALLY COMPATIBLE", "Missing 2 params should be PARTIALLY COMPATIBLE"
+        # B. Missing non-model/optional analytics column (PARTIALLY COMPATIBLE)
+        df_missing_target = df_raw.drop(columns=["pass_fail"])
+        rep_missing_target = validate_dataset_schema(df_missing_target)
+        assert rep_missing_target["compatibility_status"] == "PARTIALLY COMPATIBLE", "Missing pass_fail should be PARTIALLY COMPATIBLE"
 
-        # C. Incompatible dataset (Missing many params)
-        df_incomp = pd.DataFrame({"run_id": [1, 2], "random_col": ["a", "b"]})
+        # C. Incompatible dataset (Missing >= 1 required model feature)
+        df_incomp = df_raw.drop(columns=["queue_depth"])
         rep_incomp = validate_dataset_schema(df_incomp)
-        assert rep_incomp["compatibility_status"] == "INCOMPATIBLE", "Missing all params must be INCOMPATIBLE"
+        assert rep_incomp["compatibility_status"] == "INCOMPATIBLE", "Missing >=1 required model feature must be INCOMPATIBLE"
 
         # D. Duplicate run IDs
         df_dupes = df_raw.copy()

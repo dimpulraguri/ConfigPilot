@@ -425,11 +425,15 @@ Selected Threshold
 
 29.00% predicted failure probability
 
-Held-Out Test Performance
-Metric	Result
-Accuracy	83.3%
-Macro F1	0.706
-FAIL Recall	66.92%
+Held-Out Test Performance (Validated on the current synthetic challenge dataset)
+Metric	Result	Notes
+Accuracy	83.3%	Untouched test set (N=988)
+Macro F1	0.706	Selected at 0.2900 threshold
+FAIL Recall	66.92%	Detected 87 of 130 test failures
+FAIL Precision	41.63%	TP=87, FP=122 (87 of 209 flagged runs were actual failures)
+
+*Precision Caveat*: With 41.63% FAIL precision, roughly 3 in 5 flagged failures are false alarms (122 false positives out of 209 flagged runs).
+
 Confusion Matrix
                  Predicted
                  PASS   FAIL
@@ -438,7 +442,7 @@ Actual FAIL        43     87
 
 The model correctly identifies 87 of 130 failures in the held-out synthetic test set.
 
-These results demonstrate the functionality of the prototype on synthetic data and should not be interpreted as production or real-world performance.
+These results demonstrate the functionality of the engineering prototype on synthetic data and should not be interpreted as production or real-world performance.
 
 🔍 Explainability
 
@@ -554,6 +558,7 @@ SandDisk/
 │   ├── __init__.py
 │   ├── preprocessing.py
 │   ├── ingestion.py
+│   ├── leakage_audit.py
 │   ├── train_model.py
 │   ├── prediction.py
 │   ├── explanation.py

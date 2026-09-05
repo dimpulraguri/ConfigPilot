@@ -55,23 +55,23 @@ def validate_dataset_schema(df: pd.DataFrame) -> Dict[str, Any]:
     cols_with_nulls = null_counts[null_counts > 0].to_dict()
 
     # 5. Determine Model Schema Compatibility
-    # To run predictions, we need at least all 13 controllable parameters
-    if len(missing_config) == 0:
+    # Exact Rule:
+    # - SUPPORTED: 0 required model features missing AND ground-truth/analytics fields present.
+    # - PARTIALLY COMPATIBLE: All 13 model-required parameters present, but non-model/optional analytics fields (e.g., pass_fail) missing.
+    # - INCOMPATIBLE: >=1 required model feature missing (predictions disabled, since model cannot run without required inputs).
+    if len(missing_config) > 0:
+        compatibility_status = "INCOMPATIBLE"
+        compatibility_message = (
+            f"Prediction unavailable for this dataset because {len(missing_config)} required model feature(s) are missing: "
+            f"{', '.join(missing_config[:5])}{'...' if len(missing_config) > 5 else ''}."
+        )
+    else:
         if outcome_available:
             compatibility_status = "SUPPORTED"
             compatibility_message = "Dataset is fully compatible with ConfigPilot model & analytics."
         else:
             compatibility_status = "PARTIALLY COMPATIBLE"
-            compatibility_message = "All 13 controllable parameters present. Failure risk prediction active, but ground-truth pass_fail target is missing."
-    elif len(missing_config) <= 3:
-        compatibility_status = "PARTIALLY COMPATIBLE"
-        compatibility_message = f"Missing {len(missing_config)} controllable parameters ({', '.join(missing_config)}). Predictions may require default fill."
-    else:
-        compatibility_status = "INCOMPATIBLE"
-        compatibility_message = (
-            f"Prediction unavailable for this dataset because required model features are missing: "
-            f"{', '.join(missing_config[:5])}{'...' if len(missing_config) > 5 else ''}."
-        )
+            compatibility_message = "All 13 required model parameters present. Failure risk prediction active, but ground-truth pass_fail target column is missing."
 
     validation_report = {
         "total_rows": total_rows,
