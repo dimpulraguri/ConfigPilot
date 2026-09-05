@@ -372,7 +372,7 @@ System Architecture
 Architecture diagram placeholder:
 Add your final architecture diagram at:
 
-docs/images/configpilot_architecture.png
+docs/screenshots/configpilot_architecture.png
 
 Production-Oriented Architecture
 ┌───────────────────────────────┐
